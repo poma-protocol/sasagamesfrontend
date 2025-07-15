@@ -38,7 +38,7 @@ export function BattleDetailPage() {
 
   // Mock battle data - in real app, this would come from API
   const battleData = {
-    1: {
+    "1": {
       name: "Viking Warrior Challenge",
       game: "God of War",
       image: gameImages["God of War"],
@@ -48,7 +48,7 @@ export function BattleDetailPage() {
       estimatedTime: "3-5 hours",
       about: "Embark on an epic journey through the Norse realms. Face mythical creatures, solve ancient puzzles, and prove your worth as a true Viking warrior. Only the bravest will claim victory in this legendary challenge."
     },
-    2: {
+    "2": {
       name: "Champions League Quest",
       game: "FIFA 22",
       image: gameImages["FIFA 22"],
@@ -58,7 +58,7 @@ export function BattleDetailPage() {
       estimatedTime: "2-3 hours",
       about: "Rise through the ranks and claim your place among football legends. Master your skills, build the ultimate team, and compete in the most prestigious tournament in virtual football."
     },
-    3: {
+    "3": {
       name: "Treasure Hunt Expedition",
       game: "Pirate Nation",
       image: gameImages["Pirate Nation"],
@@ -70,7 +70,7 @@ export function BattleDetailPage() {
     }
   };
 
-  const currentBattle = battleData[id as keyof typeof battleData] || battleData[1];
+  const currentBattle = battleData[id as keyof typeof battleData] || battleData["1"];
   
   const battle = {
     id: id,

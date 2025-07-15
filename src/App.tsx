@@ -19,7 +19,7 @@ import { ManageGamesPage } from "@/pages/ManageGamesPage";
 import { MyBattlesPage } from "@/pages/MyBattlesPage";
 import { CreateBattlePage } from "@/pages/CreateBattlePage";
 import { RegisterGamePage } from "@/pages/RegisterGamePage";
-import { NotFound } from "@/pages/NotFound";
+import NotFound from "@/pages/NotFound";
 
 function App() {
   return (
