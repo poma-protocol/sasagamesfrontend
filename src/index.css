@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SasaGames Design System - Futuristic Web3 Gaming Platform */
+
+@layer base {
+  :root {
+    /* Core Background Colors */
+    --background: 240 6% 6%;          /* Deep black #0C0C0C */
+    --foreground: 0 0% 100%;          /* Pure white #FFFFFF */
+
+    /* Card & Surface Colors */
+    --card: 240 6% 8%;                /* Slightly lighter black */
+    --card-foreground: 0 0% 100%;     /* White text on cards */
+
+    /* Popover Colors */
+    --popover: 240 6% 8%;
+    --popover-foreground: 0 0% 100%;
+
+    /* Primary Gradient Colors - Pink/Purple to Sky Blue */
+    --primary: 294 100% 62%;          /* Magenta #F93AFF */
+    --primary-end: 195 100% 50%;      /* Sky Blue #00BFFF */
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary Colors */
+    --secondary: 240 6% 12%;          /* Dark gray surface */
+    --secondary-foreground: 0 0% 75%; /* Light gray text #BFBFBF */
+
+    /* Muted Colors */
+    --muted: 240 6% 10%;
+    --muted-foreground: 0 0% 75%;     /* Light gray #BFBFBF */
+
+    /* Accent Colors - Neon accents */
+    --accent: 187 100% 50%;           /* Neon Blue #00E5FF */
+    --accent-foreground: 240 6% 6%;   /* Dark text on bright accent */
+
+    /* Destructive Colors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Border & Input Colors */
+    --border: 240 6% 20%;             /* Subtle border */
+    --input: 240 6% 12%;              /* Input background */
+    --ring: 294 100% 62%;             /* Primary focus ring */
+
+    /* Special Gaming Colors */
+    --neon-blue: 187 100% 50%;        /* #00E5FF */
+    --neon-magenta: 315 100% 50%;     /* #FF00D4 */
+    --neon-purple: 270 100% 50%;      /* #7C00FF */
+    --glow-primary: 294 100% 62%;     /* Primary glow */
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-end)));
+    --gradient-neon: linear-gradient(135deg, hsl(var(--neon-purple)), hsl(var(--neon-blue)));
+    --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(240 6% 10%));
+
+    /* Shadows & Glows */
+    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.3);
+    --shadow-neon: 0 0 20px hsl(var(--accent) / 0.4);
+    --shadow-card: 0 8px 32px hsl(240 6% 3% / 0.8);
+
+    /* Border Radius */
+    --radius: 0.75rem;
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-glow: box-shadow 0.3s ease;
+  }
+
+  .dark {
+    /* Dark mode uses the same values for this gaming theme */
+    --background: 240 6% 6%;
+    --foreground: 0 0% 100%;
+    --card: 240 6% 8%;
+    --card-foreground: 0 0% 100%;
+    --popover: 240 6% 8%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 294 100% 62%;
+    --primary-end: 195 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 6% 12%;
+    --secondary-foreground: 0 0% 75%;
+    --muted: 240 6% 10%;
+    --muted-foreground: 0 0% 75%;
+    --accent: 187 100% 50%;
+    --accent-foreground: 240 6% 6%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 20%;
+    --input: 240 6% 12%;
+    --ring: 294 100% 62%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Gaming Component Styles */
+@layer components {
+  /* Gradient Button Variants */
+  .btn-gradient {
+    @apply bg-gradient-to-r from-primary to-primary-end text-primary-foreground font-bold transition-all duration-300;
+    box-shadow: var(--shadow-glow);
+  }
+
+  .btn-gradient:hover {
+    @apply scale-105;
+    box-shadow: var(--shadow-glow), 0 0 40px hsl(var(--primary) / 0.5);
+  }
+
+  .btn-neon {
+    @apply bg-transparent border-2 border-accent text-accent font-bold transition-all duration-300;
+    box-shadow: 0 0 15px hsl(var(--accent) / 0.3);
+  }
+
+  .btn-neon:hover {
+    @apply bg-accent text-accent-foreground;
+    box-shadow: var(--shadow-neon);
+  }
+
+  /* Gaming Card Styles */
+  .game-card {
+    @apply bg-card border border-border rounded-lg overflow-hidden transition-all duration-300;
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .game-card:hover {
+    @apply scale-105;
+    box-shadow: var(--shadow-card), var(--shadow-glow);
+  }
+
+  /* Text Gradients */
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-neon {
+    color: hsl(var(--accent));
+    text-shadow: 0 0 10px hsl(var(--accent) / 0.5);
+  }
+
+  /* Glow Effects */
+  .glow-primary {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .glow-neon {
+    box-shadow: var(--shadow-neon);
+  }
+
+  /* Animations */
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulse-glow {
+    from {
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+    }
+    to {
+      box-shadow: 0 0 30px hsl(var(--primary) / 0.6);
+    }
+  }
+}
