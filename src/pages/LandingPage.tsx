@@ -26,8 +26,8 @@ const mockStats = {
 const mockFeaturedBattles = [
   {
     id: 1,
-    name: "Dragon Slayer Championship",
-    image: "/api/placeholder/400/300",
+    name: "Viking Warrior Challenge",
+    image: "/lovable-uploads/ce11f41d-57a8-4a0a-8bc1-3dc66db8c318.png",
     reward: 5.5,
     playerCount: 245,
     maxPlayers: 500,
@@ -37,8 +37,8 @@ const mockFeaturedBattles = [
   },
   {
     id: 2,
-    name: "Crypto Miners Rally",
-    image: "/api/placeholder/400/300",
+    name: "Champions League Quest",
+    image: "/lovable-uploads/62fb7c52-a279-4f8c-bdb5-65b1c244f2bc.png",
     reward: 3.2,
     playerCount: 89,
     maxPlayers: 200,
@@ -48,8 +48,8 @@ const mockFeaturedBattles = [
   },
   {
     id: 3,
-    name: "Space Conquest Arena",
-    image: "/api/placeholder/400/300",
+    name: "Treasure Hunt Expedition",
+    image: "/lovable-uploads/5d0f9609-6bf9-45db-bfde-86e1441e22b5.png",
     reward: 7.8,
     playerCount: 156,
     maxPlayers: 300,

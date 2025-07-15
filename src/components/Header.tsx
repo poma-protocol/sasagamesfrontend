@@ -21,7 +21,7 @@ export function Header() {
   ];
 
   const handleAdminLogin = () => {
-    navigate("/admin-login");
+    navigate("/admin/login");
   };
 
   const handleAdminLogout = () => {
@@ -69,13 +69,13 @@ export function Header() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem asChild>
-                    <Link to="/manage-games" className="flex items-center">
+                    <Link to="/admin/manage-games" className="flex items-center">
                       <GamepadIcon className="h-4 w-4 mr-2" />
                       Manage Games
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/register-game" className="flex items-center">
+                    <Link to="/admin/register-game" className="flex items-center">
                       <Plus className="h-4 w-4 mr-2" />
                       Register Game
                     </Link>
@@ -141,14 +141,14 @@ export function Header() {
               {isAdminLoggedIn ? (
                 <div className="space-y-2 pt-4 border-t border-border">
                   <Link
-                    to="/manage-games"
+                    to="/admin/manage-games"
                     className="block font-rajdhani font-medium text-foreground hover:text-accent"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Manage Games
                   </Link>
                   <Link
-                    to="/register-game"
+                    to="/admin/register-game"
                     className="block font-rajdhani font-medium text-foreground hover:text-accent"
                     onClick={() => setIsMenuOpen(false)}
                   >
