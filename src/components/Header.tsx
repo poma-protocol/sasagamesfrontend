@@ -1,26 +1,32 @@
+
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Menu, X, Zap, Wallet, Settings, Plus, GamepadIcon } from "lucide-react";
+import { Menu, X, Zap, Settings, Plus, GamepadIcon, LogOut } from "lucide-react";
+import { useAdmin } from "@/contexts/AdminContext";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const { isAdminLoggedIn, logout } = useAdmin();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = (path: string) => location.pathname === path;
 
   const navItems = [
-    { name: "Quests", path: "/quests" },
     { name: "Battles", path: "/battles" },
     { name: "How it Works", path: "/how-it-works" },
     { name: "About Us", path: "/about" },
   ];
 
-  const handleConnectWallet = () => {
-    // TODO: Implement wallet connection logic
-    setIsWalletConnected(!isWalletConnected);
+  const handleAdminLogin = () => {
+    navigate("/admin-login");
+  };
+
+  const handleAdminLogout = () => {
+    logout();
+    navigate("/");
   };
 
   return (
@@ -50,10 +56,10 @@ export function Header() {
             ))}
           </nav>
 
-          {/* Admin Dropdown & Wallet Connect */}
+          {/* Admin Area & Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* Admin Dropdown - Show when wallet is connected */}
-            {isWalletConnected && (
+            {/* Admin Dropdown - Show when admin is logged in */}
+            {isAdminLoggedIn && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="font-rajdhani font-semibold">
@@ -81,23 +87,26 @@ export function Header() {
                       My Battles
                     </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleAdminLogout} className="flex items-center text-red-600">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
 
-            {/* Wallet Connect Button */}
-            <Button
-              onClick={handleConnectWallet}
-              variant={isWalletConnected ? "secondary" : "default"}
-              className={`font-rajdhani font-semibold ${
-                isWalletConnected
-                  ? "btn-neon"
-                  : "btn-gradient"
-              }`}
-            >
-              <Wallet className="h-4 w-4 mr-2" />
-              {isWalletConnected ? "0x1234...5678" : "Connect Wallet"}
-            </Button>
+            {/* Admin Login Button - Show when not logged in */}
+            {!isAdminLoggedIn && (
+              <Button
+                onClick={handleAdminLogin}
+                variant="default"
+                className="font-rajdhani font-semibold btn-gradient"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Admin Login
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -127,18 +136,47 @@ export function Header() {
                   {item.name}
                 </Link>
               ))}
-              <Button
-                onClick={handleConnectWallet}
-                variant={isWalletConnected ? "secondary" : "default"}
-                className={`w-full font-rajdhani font-semibold ${
-                  isWalletConnected
-                    ? "btn-neon"
-                    : "btn-gradient"
-                }`}
-              >
-                <Wallet className="h-4 w-4 mr-2" />
-                {isWalletConnected ? "0x1234...5678" : "Connect Wallet"}
-              </Button>
+              
+              {/* Mobile Admin Actions */}
+              {isAdminLoggedIn ? (
+                <div className="space-y-2 pt-4 border-t border-border">
+                  <Link
+                    to="/manage-games"
+                    className="block font-rajdhani font-medium text-foreground hover:text-accent"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Manage Games
+                  </Link>
+                  <Link
+                    to="/register-game"
+                    className="block font-rajdhani font-medium text-foreground hover:text-accent"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Register Game
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleAdminLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full text-left font-rajdhani font-medium text-red-600 hover:text-red-500"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <Button
+                  onClick={() => {
+                    handleAdminLogin();
+                    setIsMenuOpen(false);
+                  }}
+                  variant="default"
+                  className="w-full font-rajdhani font-semibold btn-gradient"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Admin Login
+                </Button>
+              )}
             </nav>
           </div>
         )}
