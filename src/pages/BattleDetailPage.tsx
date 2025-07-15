@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,37 +29,72 @@ export function BattleDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   
+  // Game images mapping
+  const gameImages = {
+    "God of War": "/lovable-uploads/ce11f41d-57a8-4a0a-8bc1-3dc66db8c318.png",
+    "FIFA 22": "/lovable-uploads/62fb7c52-a279-4f8c-bdb5-65b1c244f2bc.png",
+    "Pirate Nation": "/lovable-uploads/5d0f9609-6bf9-45db-bfde-86e1441e22b5.png"
+  };
+
   // Mock battle data - in real app, this would come from API
+  const battleData = {
+    1: {
+      name: "Viking Warrior Challenge",
+      game: "God of War",
+      image: gameImages["God of War"],
+      reward: "0.8 ETH",
+      category: "Action",
+      difficulty: "Legendary",
+      estimatedTime: "3-5 hours",
+      about: "Embark on an epic journey through the Norse realms. Face mythical creatures, solve ancient puzzles, and prove your worth as a true Viking warrior. Only the bravest will claim victory in this legendary challenge."
+    },
+    2: {
+      name: "Champions League Quest",
+      game: "FIFA 22",
+      image: gameImages["FIFA 22"],
+      reward: "0.6 ETH",
+      category: "Sports",
+      difficulty: "Professional",
+      estimatedTime: "2-3 hours",
+      about: "Rise through the ranks and claim your place among football legends. Master your skills, build the ultimate team, and compete in the most prestigious tournament in virtual football."
+    },
+    3: {
+      name: "Treasure Hunt Expedition",
+      game: "Pirate Nation",
+      image: gameImages["Pirate Nation"],
+      reward: "0.7 ETH",
+      category: "Adventure",
+      difficulty: "Hard",
+      estimatedTime: "4-6 hours",
+      about: "Set sail across dangerous seas, discover hidden islands, and claim the greatest treasure known to pirate-kind. Navigate treacherous waters and outsmart rival pirates in this ultimate seafaring adventure."
+    }
+  };
+
+  const currentBattle = battleData[id as keyof typeof battleData] || battleData[1];
+  
   const battle = {
     id: id,
-    name: "Zombie Survival Challenge",
-    image: "/api/placeholder/800/400",
-    reward: "0.5 ETH",
+    ...currentBattle,
     goal: 100,
     currentProgress: 45,
     maxPlayers: 500,
     currentPlayers: 234,
     startDate: "2024-01-15",
     endDate: "2024-02-15",
-    game: "Zombie Apocalypse",
-    category: "Action",
     status: "active",
-    difficulty: "Hard",
-    estimatedTime: "2-4 hours",
     instructions: [
       "Connect your wallet to join the battle",
-      "Survive 100 waves of zombies in the game",
-      "Each wave completion counts toward your progress",
+      "Complete the main storyline objectives",
+      "Each milestone completion counts toward your progress",
       "Battle ends when time runs out or goal is reached",
       "Top performers get bonus rewards"
     ],
-    about: "Test your survival skills in this intense zombie apocalypse challenge. Fight through waves of undead enemies and prove you're the ultimate survivor. Only the strongest will claim the rewards!",
     leaderboard: [
-      { rank: 1, player: "ZombieSlayer99", progress: 87, reward: "0.15 ETH" },
-      { rank: 2, player: "SurvivalKing", progress: 82, reward: "0.10 ETH" },
-      { rank: 3, player: "DeadShot", progress: 78, reward: "0.08 ETH" },
-      { rank: 4, player: "LastHope", progress: 71, reward: "0.05 ETH" },
-      { rank: 5, player: "GamerPro", progress: 65, reward: "0.02 ETH" }
+      { rank: 1, player: "LegendaryWarrior", progress: 87, reward: "0.15 ETH" },
+      { rank: 2, player: "ChampionSlayer", progress: 82, reward: "0.10 ETH" },
+      { rank: 3, player: "EliteGamer", progress: 78, reward: "0.08 ETH" },
+      { rank: 4, player: "ProPlayer", progress: 71, reward: "0.05 ETH" },
+      { rank: 5, player: "SkillMaster", progress: 65, reward: "0.02 ETH" }
     ],
     features: [
       { icon: Zap, title: "Real-time Progress", description: "Track your progress live" },
@@ -281,7 +315,7 @@ export function BattleDetailPage() {
                   </div>
                   <div className="flex justify-between text-xs text-muted-foreground font-rajdhani">
                     <span>0</span>
-                    <span>{battle.goal} waves</span>
+                    <span>{battle.goal} objectives</span>
                   </div>
                 </div>
                 

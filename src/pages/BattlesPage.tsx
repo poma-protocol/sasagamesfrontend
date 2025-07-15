@@ -6,91 +6,98 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, SlidersHorizontal, Trophy } from "lucide-react";
 
+// Game images mapping
+const gameImages = {
+  "God of War": "/lovable-uploads/ce11f41d-57a8-4a0a-8bc1-3dc66db8c318.png",
+  "FIFA 22": "/lovable-uploads/62fb7c52-a279-4f8c-bdb5-65b1c244f2bc.png",
+  "Pirate Nation": "/lovable-uploads/5d0f9609-6bf9-45db-bfde-86e1441e22b5.png"
+};
+
 // Mock data for battles
 const mockBattles = [
   {
     id: 1,
-    name: "Dragon Slayer Championship",
-    image: "/api/placeholder/400/300",
-    reward: 5.5,
+    name: "Viking Warrior Challenge",
+    image: gameImages["God of War"],
+    reward: 0.8,
     playerCount: 245,
     maxPlayers: 500,
     startDate: "2024-01-15",
     endDate: "2024-02-15",
     status: "active" as const,
-    game: "Fantasy Quest",
-    category: "RPG",
-    challengeName: "Defeat Ancient Dragon"
+    game: "God of War",
+    category: "Action",
+    challengeName: "Complete Norse Saga"
   },
   {
     id: 2,
-    name: "Crypto Miners Rally",
-    image: "/api/placeholder/400/300",
-    reward: 3.2,
-    playerCount: 89,
-    maxPlayers: 200,
+    name: "Champions League Quest",
+    image: gameImages["FIFA 22"],
+    reward: 0.6,
+    playerCount: 189,
+    maxPlayers: 300,
     startDate: "2024-01-20",
     endDate: "2024-02-20",
-    status: "upcoming" as const,
-    game: "Mining Simulator",
-    category: "Strategy",
-    challengeName: "Mine 1000 Coins"
+    status: "active" as const,
+    game: "FIFA 22",
+    category: "Sports",
+    challengeName: "Win Championship"
   },
   {
     id: 3,
-    name: "Space Conquest Arena",
-    image: "/api/placeholder/400/300",
-    reward: 7.8,
+    name: "Treasure Hunt Expedition",
+    image: gameImages["Pirate Nation"],
+    reward: 0.7,
     playerCount: 156,
-    maxPlayers: 300,
+    maxPlayers: 400,
     startDate: "2024-01-10",
     endDate: "2024-01-31",
     status: "active" as const,
-    game: "Galactic Wars",
-    category: "Action",
-    challengeName: "Conquer 5 Planets"
+    game: "Pirate Nation",
+    category: "Adventure",
+    challengeName: "Find Golden Treasure"
   },
   {
     id: 4,
-    name: "Racing Championship",
-    image: "/api/placeholder/400/300",
-    reward: 2.1,
+    name: "Legends Championship",
+    image: gameImages["FIFA 22"],
+    reward: 0.5,
     playerCount: 180,
     maxPlayers: 250,
     startDate: "2024-01-08",
     endDate: "2024-01-25",
     status: "completed" as const,
-    game: "Speed Racers",
-    category: "Racing",
-    challengeName: "Win 10 Races"
+    game: "FIFA 22",
+    category: "Sports",
+    challengeName: "Ultimate Team Battle"
   },
   {
     id: 5,
-    name: "Tower Defense Masters",
-    image: "/api/placeholder/400/300",
-    reward: 4.3,
+    name: "Pirate Fleet Commander",
+    image: gameImages["Pirate Nation"],
+    reward: 0.9,
     playerCount: 67,
     maxPlayers: 150,
     startDate: "2024-01-25",
     endDate: "2024-02-25",
     status: "upcoming" as const,
-    game: "Defense Elite",
+    game: "Pirate Nation",
     category: "Strategy",
-    challengeName: "Survive 50 Waves"
+    challengeName: "Command Your Fleet"
   },
   {
     id: 6,
-    name: "Puzzle Master Quest",
-    image: "/api/placeholder/400/300",
-    reward: 1.8,
+    name: "Ragnarok Challenge",
+    image: gameImages["God of War"],
+    reward: 1.2,
     playerCount: 234,
-    maxPlayers: 400,
+    maxPlayers: 600,
     startDate: "2024-01-12",
     endDate: "2024-02-12",
-    status: "active" as const,
-    game: "Mind Bender",
-    category: "Puzzle",
-    challengeName: "Solve 100 Puzzles"
+    status: "upcoming" as const,
+    game: "God of War",
+    category: "Action",
+    challengeName: "Survive Ragnarok"
   }
 ];
 
