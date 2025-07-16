@@ -19,6 +19,7 @@ import { ManageGamesPage } from "@/pages/ManageGamesPage";
 import { MyBattlesPage } from "@/pages/MyBattlesPage";
 import { CreateBattlePage } from "@/pages/CreateBattlePage";
 import { RegisterGamePage } from "@/pages/RegisterGamePage";
+import { CreateActivityPage } from "@/pages/CreateActivityPage";
 import NotFound from "@/pages/NotFound";
 
 function App() {
@@ -65,6 +66,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <RegisterGamePage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/create-activity" 
+              element={
+                <ProtectedRoute>
+                  <CreateActivityPage />
                 </ProtectedRoute>
               } 
             />

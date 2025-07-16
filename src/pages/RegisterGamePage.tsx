@@ -1,84 +1,76 @@
-import { useState } from "react";
+
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Trash2, Upload, FileText } from "lucide-react";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { toast } from "sonner";
 
-interface Challenge {
-  name: string;
-  player_address_variable: string;
-  function_name: string;
-  useForwarder: boolean;
-  forwarderAddress: string;
-  forwarderABI: string;
-  methodDataAttributeName: string;
-  wantedData: string;
-  countItems: boolean;
-  contract_address: string;
-  abi: string;
-}
+const challengeSchema = z.object({
+  name: z.string().min(1, "Challenge name is required"),
+  player_address_variable: z.string().min(1, "Player address variable is required"),
+  function_name: z.string().min(1, "Function name is required"),
+  useForwarder: z.boolean(),
+  forwarderAddress: z.string().optional(),
+  forwarderABI: z.string().optional(),
+  methodDataAttributeName: z.string().optional(),
+  wantedData: z.string().optional(),
+  countItems: z.boolean(),
+  contract_address: z.string().min(1, "Contract address is required"),
+  abi: z.string().optional(),
+});
+
+const gameSchema = z.object({
+  name: z.string().min(1, "Game name is required"),
+  category: z.string().min(1, "Category is required"),
+  image: z.string().optional(),
+  contract_address: z.string().min(1, "Contract address is required"),
+  abi: z.string().optional(),
+  challenges: z.array(challengeSchema).min(1, "At least one challenge is required"),
+});
+
+type GameFormData = z.infer<typeof gameSchema>;
 
 export function RegisterGamePage() {
-  const [gameData, setGameData] = useState({
-    name: "",
-    category: "",
-    image: "",
-    contract_address: "",
-    abi: ""
+  const form = useForm<GameFormData>({
+    resolver: zodResolver(gameSchema),
+    defaultValues: {
+      name: "",
+      category: "",
+      image: "",
+      contract_address: "",
+      abi: "",
+      challenges: [{
+        name: "",
+        player_address_variable: "",
+        function_name: "",
+        useForwarder: false,
+        forwarderAddress: "",
+        forwarderABI: "",
+        methodDataAttributeName: "",
+        wantedData: "",
+        countItems: false,
+        contract_address: "",
+        abi: "",
+      }],
+    },
   });
 
-  const [challenges, setChallenges] = useState<Challenge[]>([
-    {
-      name: "",
-      player_address_variable: "",
-      function_name: "",
-      useForwarder: false,
-      forwarderAddress: "",
-      forwarderABI: "",
-      methodDataAttributeName: "",
-      wantedData: "",
-      countItems: false,
-      contract_address: "",
-      abi: ""
-    }
-  ]);
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "challenges",
+  });
 
-  const addChallenge = () => {
-    setChallenges([...challenges, {
-      name: "",
-      player_address_variable: "",
-      function_name: "",
-      useForwarder: false,
-      forwarderAddress: "",
-      forwarderABI: "",
-      methodDataAttributeName: "",
-      wantedData: "",
-      countItems: false,
-      contract_address: "",
-      abi: ""
-    }]);
-  };
-
-  const removeChallenge = (index: number) => {
-    if (challenges.length > 1) {
-      setChallenges(challenges.filter((_, i) => i !== index));
-    }
-  };
-
-  const updateChallenge = (index: number, field: keyof Challenge, value: string | boolean) => {
-    const newChallenges = [...challenges];
-    newChallenges[index] = { ...newChallenges[index], [field]: value };
-    setChallenges(newChallenges);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Registering game:", { ...gameData, challenges });
+  const onSubmit = (data: GameFormData) => {
+    console.log("Registering game:", data);
+    toast.success("Game registered successfully!");
     // In real app, this would call the API
   };
 
@@ -97,256 +89,369 @@ export function RegisterGamePage() {
             </CardHeader>
             
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Game Information */}
-                <div className="space-y-6">
-                  <h2 className="text-xl font-semibold">Game Information</h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Game Name</Label>
-                      <Input
-                        id="name"
-                        placeholder="Enter game name"
-                        value={gameData.name}
-                        onChange={(e) => setGameData(prev => ({ ...prev, name: e.target.value }))}
-                        required
-                      />
-                    </div>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                  {/* Game Information */}
+                  <div className="space-y-6">
+                    <h2 className="text-xl font-semibold">Game Information</h2>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="category">Category</Label>
-                      <Select value={gameData.category} onValueChange={(value) => setGameData(prev => ({ ...prev, category: value }))}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="action">Action</SelectItem>
-                          <SelectItem value="adventure">Adventure</SelectItem>
-                          <SelectItem value="racing">Racing</SelectItem>
-                          <SelectItem value="strategy">Strategy</SelectItem>
-                          <SelectItem value="puzzle">Puzzle</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="image">Game Image</Label>
-                    <div className="flex items-center gap-4">
-                      <Input
-                        id="image"
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setGameData(prev => ({ ...prev, image: file.name }));
-                          }
-                        }}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Game Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter game name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                      <Button type="button" variant="outline" size="sm">
-                        <Upload className="h-4 w-4 mr-2" />
-                        Upload
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="contract">Contract Address</Label>
-                    <Input
-                      id="contract"
-                      placeholder="0x..."
-                      value={gameData.contract_address}
-                      onChange={(e) => setGameData(prev => ({ ...prev, contract_address: e.target.value }))}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="abi">Contract ABI</Label>
-                    <div className="flex items-center gap-4">
-                      <Input
-                        id="abi"
-                        type="file"
-                        accept=".json"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setGameData(prev => ({ ...prev, abi: file.name }));
-                          }
-                        }}
-                      />
-                      <Button type="button" variant="outline" size="sm">
-                        <FileText className="h-4 w-4 mr-2" />
-                        Upload JSON
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Challenges */}
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold">Challenges</h2>
-                    <Button type="button" onClick={addChallenge} variant="outline" size="sm">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Challenge
-                    </Button>
-                  </div>
-
-                  {challenges.map((challenge, index) => (
-                    <Card key={index} className="border-secondary/20 bg-secondary/5">
-                      <CardHeader>
-                        <div className="flex justify-between items-center">
-                          <CardTitle className="text-lg">Challenge {index + 1}</CardTitle>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removeChallenge(index)}
-                            disabled={challenges.length === 1}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </CardHeader>
                       
-                      <CardContent className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label>Challenge Name</Label>
-                            <Input
-                              placeholder="e.g., Survive 100 Waves"
-                              value={challenge.name}
-                              onChange={(e) => updateChallenge(index, 'name', e.target.value)}
-                              required
-                            />
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label>Player Address Variable</Label>
-                            <Input
-                              placeholder="e.g., playerAddress"
-                              value={challenge.player_address_variable}
-                              onChange={(e) => updateChallenge(index, 'player_address_variable', e.target.value)}
-                              required
-                            />
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label>Function Name</Label>
-                            <Input
-                              placeholder="e.g., completeWave"
-                              value={challenge.function_name}
-                              onChange={(e) => updateChallenge(index, 'function_name', e.target.value)}
-                              required
-                            />
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label>Contract Address</Label>
-                            <Input
-                              placeholder="0x..."
-                              value={challenge.contract_address}
-                              onChange={(e) => updateChallenge(index, 'contract_address', e.target.value)}
-                              required
-                            />
-                          </div>
-                        </div>
+                      <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Category</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select category" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="action">Action</SelectItem>
+                                <SelectItem value="adventure">Adventure</SelectItem>
+                                <SelectItem value="racing">Racing</SelectItem>
+                                <SelectItem value="strategy">Strategy</SelectItem>
+                                <SelectItem value="puzzle">Puzzle</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                        <div className="flex items-center space-x-2">
-                          <Switch
-                            id={`forwarder-${index}`}
-                            checked={challenge.useForwarder}
-                            onCheckedChange={(checked) => updateChallenge(index, 'useForwarder', checked)}
-                          />
-                          <Label htmlFor={`forwarder-${index}`}>Use Forwarder</Label>
-                        </div>
-
-                        {challenge.useForwarder && (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label>Forwarder Address</Label>
+                    <FormField
+                      control={form.control}
+                      name="image"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Game Image</FormLabel>
+                          <div className="flex items-center gap-4">
+                            <FormControl>
                               <Input
-                                placeholder="0x..."
-                                value={challenge.forwarderAddress}
-                                onChange={(e) => updateChallenge(index, 'forwarderAddress', e.target.value)}
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    field.onChange(file.name);
+                                  }
+                                }}
                               />
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <Label>Forwarder ABI</Label>
+                            </FormControl>
+                            <Button type="button" variant="outline" size="sm">
+                              <Upload className="h-4 w-4 mr-2" />
+                              Upload
+                            </Button>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="contract_address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Contract Address</FormLabel>
+                          <FormControl>
+                            <Input placeholder="0x..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="abi"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Contract ABI</FormLabel>
+                          <div className="flex items-center gap-4">
+                            <FormControl>
                               <Input
                                 type="file"
                                 accept=".json"
                                 onChange={(e) => {
                                   const file = e.target.files?.[0];
                                   if (file) {
-                                    updateChallenge(index, 'forwarderABI', file.name);
+                                    field.onChange(file.name);
                                   }
                                 }}
                               />
+                            </FormControl>
+                            <Button type="button" variant="outline" size="sm">
+                              <FileText className="h-4 w-4 mr-2" />
+                              Upload JSON
+                            </Button>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <Separator />
+
+                  {/* Challenges */}
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                      <h2 className="text-xl font-semibold">Challenges</h2>
+                      <Button 
+                        type="button" 
+                        onClick={() => append({
+                          name: "",
+                          player_address_variable: "",
+                          function_name: "",
+                          useForwarder: false,
+                          forwarderAddress: "",
+                          forwarderABI: "",
+                          methodDataAttributeName: "",
+                          wantedData: "",
+                          countItems: false,
+                          contract_address: "",
+                          abi: "",
+                        })} 
+                        variant="outline" 
+                        size="sm"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Challenge
+                      </Button>
+                    </div>
+
+                    {fields.map((field, index) => (
+                      <Card key={field.id} className="border-secondary/20 bg-secondary/5">
+                        <CardHeader>
+                          <div className="flex justify-between items-center">
+                            <CardTitle className="text-lg">Challenge {index + 1}</CardTitle>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => remove(index)}
+                              disabled={fields.length === 1}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </CardHeader>
+                        
+                        <CardContent className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name={`challenges.${index}.name`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Challenge Name</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="e.g., Survive 100 Waves" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <FormField
+                              control={form.control}
+                              name={`challenges.${index}.player_address_variable`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Player Address Variable</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="e.g., playerAddress" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <FormField
+                              control={form.control}
+                              name={`challenges.${index}.function_name`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Function Name</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="e.g., completeWave" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <FormField
+                              control={form.control}
+                              name={`challenges.${index}.contract_address`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Contract Address</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="0x..." {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                          <FormField
+                            control={form.control}
+                            name={`challenges.${index}.useForwarder`}
+                            render={({ field }) => (
+                              <FormItem className="flex items-center space-x-2">
+                                <FormControl>
+                                  <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
+                                <FormLabel>Use Forwarder</FormLabel>
+                              </FormItem>
+                            )}
+                          />
+
+                          {form.watch(`challenges.${index}.useForwarder`) && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <FormField
+                                control={form.control}
+                                name={`challenges.${index}.forwarderAddress`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Forwarder Address</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="0x..." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={form.control}
+                                name={`challenges.${index}.forwarderABI`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Forwarder ABI</FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        type="file"
+                                        accept=".json"
+                                        onChange={(e) => {
+                                          const file = e.target.files?.[0];
+                                          if (file) {
+                                            field.onChange(file.name);
+                                          }
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label>Method Data Attribute Name</Label>
-                            <Input
-                              placeholder="e.g., methodData"
-                              value={challenge.methodDataAttributeName}
-                              onChange={(e) => updateChallenge(index, 'methodDataAttributeName', e.target.value)}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name={`challenges.${index}.methodDataAttributeName`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Method Data Attribute Name</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="e.g., methodData" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <FormField
+                              control={form.control}
+                              name={`challenges.${index}.wantedData`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Wanted Data</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="e.g., waveNumber" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
                             />
                           </div>
-                          
-                          <div className="space-y-2">
-                            <Label>Wanted Data</Label>
-                            <Input
-                              placeholder="e.g., waveNumber"
-                              value={challenge.wantedData}
-                              onChange={(e) => updateChallenge(index, 'wantedData', e.target.value)}
-                            />
-                          </div>
-                        </div>
 
-                        <div className="flex items-center space-x-2">
-                          <Switch
-                            id={`count-${index}`}
-                            checked={challenge.countItems}
-                            onCheckedChange={(checked) => updateChallenge(index, 'countItems', checked)}
+                          <FormField
+                            control={form.control}
+                            name={`challenges.${index}.countItems`}
+                            render={({ field }) => (
+                              <FormItem className="flex items-center space-x-2">
+                                <FormControl>
+                                  <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
+                                <FormLabel>Count Items</FormLabel>
+                              </FormItem>
+                            )}
                           />
-                          <Label htmlFor={`count-${index}`}>Count Items</Label>
-                        </div>
 
-                        <div className="space-y-2">
-                          <Label>Challenge ABI</Label>
-                          <Input
-                            type="file"
-                            accept=".json"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                updateChallenge(index, 'abi', file.name);
-                              }
-                            }}
+                          <FormField
+                            control={form.control}
+                            name={`challenges.${index}.abi`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Challenge ABI</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="file"
+                                    accept=".json"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) {
+                                        field.onChange(file.name);
+                                      }
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
                           />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
 
-                <Button 
-                  type="submit"
-                  className="w-full text-lg py-6 bg-gradient-to-r from-primary to-primary-end hover:opacity-90 transition-opacity"
-                >
-                  REGISTER GAME
-                </Button>
-              </form>
+                  <Button 
+                    type="submit"
+                    className="w-full text-lg py-6 bg-gradient-to-r from-primary to-primary-end hover:opacity-90 transition-opacity"
+                  >
+                    REGISTER GAME
+                  </Button>
+                </form>
+              </Form>
             </CardContent>
           </Card>
         </div>

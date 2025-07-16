@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -125,7 +124,7 @@ export function ManageActivitiesPage() {
               </p>
             </div>
           </div>
-          <Link to="/create-activity">
+          <Link to="/admin/create-activity">
             <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity font-rajdhani font-semibold">
               <Plus className="h-4 w-4 mr-2" />
               CREATE ACTIVITY
@@ -275,7 +274,7 @@ export function ManageActivitiesPage() {
                   <TableRow key={activity.id} className="hover:bg-muted/30">
                     <TableCell className="font-medium">{activity.name}</TableCell>
                     <TableCell>
-                      <Link to={`/manage-games`} className="text-primary hover:underline">
+                      <Link to={`/admin/manage-games`} className="text-primary hover:underline">
                         {activity.game}
                       </Link>
                     </TableCell>
