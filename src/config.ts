@@ -20,9 +20,8 @@ if (environment === "prod") {
 } else {
     chains = [arbitrumSepolia];
 }
-console.log("Using chains: ", chains);
 const config = getDefaultConfig({
-    appName: 'ZendoCash',
+    appName: 'SasaGames',
     projectId: PROJECT_ID,
     chains: chains,
 });
