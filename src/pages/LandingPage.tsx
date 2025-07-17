@@ -46,16 +46,31 @@ const testimonials = [
 ];
 
 function FeaturedDeals() {
-  const { featured } = useLoaderData();
+  //@ts-ignore
+  const { featured } = useLoaderData(); // Shows error but is how the docs did it
+
+  const loadingElement = <div className="font-rajdhani text-xl md:text-2xl text-muted-foreground mb-8 text-center">
+    Getting featured deals...
+  </div>;
+
+  const errorElement = <div className="font-rajdhani text-xl md:text-2xl text-muted-foreground mb-8 text-center">
+    Could not get featured deals
+  </div>
+
+  const noFeaturedDeals = <div className="font-rajdhani text-xl md:text-2xl text-muted-foreground mb-8 text-center">
+    No featured deals
+  </div>
 
   return (
-    <Suspense fallback={<div>Getting featured deals...</div>}>
+    <Suspense fallback={loadingElement}>
       <Await
         resolve={featured}
-        errorElement={
-          <div>Error getting featured deals</div>
-        }
+        errorElement={errorElement}
         children={(resolvedFeaturedItems: FeaturedDeal[]) => {
+          if (resolvedFeaturedItems.length <= 0) {
+            return noFeaturedDeals
+          }
+
           return (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               {resolvedFeaturedItems.map((battle) => (
