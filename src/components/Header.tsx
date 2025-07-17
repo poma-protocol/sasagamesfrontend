@@ -21,7 +21,7 @@ export function Header() {
   ];
 
   const handleAdminLogin = () => {
-    navigate("/admin/login");
+    navigate("/admin-login");
   };
 
   const handleAdminLogout = () => {
