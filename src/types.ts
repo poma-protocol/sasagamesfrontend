@@ -16,8 +16,6 @@ export const gameSchema = z.object({
   name: z.string().min(1, "Game name is required"),
   category: z.string().min(1, "Category is required"),
   image: z.instanceof(File).optional(),
-  contract_address: z.string().min(1, "Contract address is required"),
-//   abi: z.any().optional(),
   challenges: z.array(challengeSchema).min(1, "At least one challenge is required"),
 });
 export type GameFormData = z.infer<typeof gameSchema>;

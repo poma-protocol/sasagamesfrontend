@@ -181,7 +181,7 @@ export function RegisterGamePage() {
                                             )}
                                         />
 
-                                        <FormField
+                                        {/* <FormField
                                             control={form.control}
                                             name="contract_address"
                                             render={({ field }) => (
@@ -193,7 +193,7 @@ export function RegisterGamePage() {
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
-                                        />
+                                        /> */}
 
                                         {/* <FormField
                                             control={form.control}
