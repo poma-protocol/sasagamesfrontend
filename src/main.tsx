@@ -18,13 +18,14 @@ import { CreateActivityPage } from "@/pages/CreateActivityPage";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import App from './App';
 import NotFound from "@/pages/NotFound";
+import featuredDealsLoader from './loaders/featuredDeals';
 const router = createBrowserRouter([
     {
          path: "/",
         element: <App />,
         errorElement: <NotFound />,
         children: [
-            { path: "/", element: <LandingPage /> },
+            { path: "/", loader: featuredDealsLoader, element: <LandingPage /> },
             { path: "/battles", element: <BattlesPage /> },
             { path: "/battles/:id", element: <BattleDetailPage /> },
             { path: "/how-it-works", element: <HowItWorksPage /> },

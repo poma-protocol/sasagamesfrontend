@@ -18,4 +18,18 @@ export const gameSchema = z.object({
   image: z.instanceof(File).optional(),
   challenges: z.array(challengeSchema).min(1, "At least one challenge is required"),
 });
+
+export const featuredDealsSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    image: z.string(),
+    reward: z.number(),
+    playerCount: z.number(),
+    maxPlayers: z.number(),
+    startDate: z.string(),
+    endDate: z.string(),
+    status: z.string()
+});
+
+export type FeaturedDeal = z.infer<typeof featuredDealsSchema>;
 export type GameFormData = z.infer<typeof gameSchema>;
