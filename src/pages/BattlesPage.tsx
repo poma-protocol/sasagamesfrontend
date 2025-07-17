@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, SlidersHorizontal, Trophy } from "lucide-react";
+import { Search, Filter, SlidersHorizontal, Trophy, ArrowLeft, ArrowRight } from "lucide-react";
 
 // Game images mapping
 const gameImages = {
@@ -100,6 +100,20 @@ const mockBattles = [
     challengeName: "Survive Ragnarok"
   }
 ];
+
+interface NextPreviousBattlesProps {
+  page: number
+}
+
+function NextPreviousBattles(props: NextPreviousBattlesProps) {
+  return (
+    <div className="flex flex-row items-center justify-center gap-4 mt-8">
+      <Button><ArrowLeft /></Button>
+      <div>{props.page}</div>
+      <Button><ArrowRight /></Button>
+    </div>
+  );
+}
 
 export function BattlesPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -280,8 +294,6 @@ export function BattlesPage() {
               <BattleCard
                 key={battle.id}
                 {...battle}
-                onJoin={handleJoinBattle}
-                onView={handleViewBattle}
               />
             ))}
           </div>
@@ -299,6 +311,8 @@ export function BattlesPage() {
             </Button>
           </div>
         )}
+
+        <NextPreviousBattles page={1}/>
       </div>
     </div>
   );
