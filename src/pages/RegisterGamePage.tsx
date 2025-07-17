@@ -22,8 +22,6 @@ export function RegisterGamePage() {
             name: "",
             category: "",
             image: null,
-            contract_address: "",
-            abi: null,
             challenges: [{
                 name: "",
                 player_address_variable: "",
