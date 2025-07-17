@@ -2,6 +2,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { FeaturedDeal } from "@/types";
 import { Calendar, Users, Trophy, Clock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -16,31 +17,10 @@ interface BattleCardProps {
   endDate: string;
   status: "upcoming" | "active" | "completed";
   onJoin?: (id: number) => void;
-  onView?: (id: number) => void;
 }
 
-export function BattleCard({
-  id,
-  name,
-  image,
-  reward,
-  playerCount,
-  maxPlayers,
-  startDate,
-  endDate,
-  status,
-  onJoin,
-  onView,
-}: BattleCardProps) {
+export function BattleCard(props: FeaturedDeal) {
   const navigate = useNavigate();
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -56,15 +36,15 @@ export function BattleCard({
   };
 
   const handleCardClick = () => {
-    navigate(`/battles/${id}`);
+    navigate(`/battles/${props.id}`);
   };
 
   const handleButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     
-    if (status === "active" && onJoin) {
-      onJoin(id);
+    if (status === "active") {
+      console.log("Joining");
     } else {
       navigate(`/battles/${id}`);
     }
@@ -117,7 +97,7 @@ export function BattleCard({
           <div className="flex items-center space-x-2 text-muted-foreground">
             <Clock className="h-4 w-4" />
             <span className="font-rajdhani text-sm">
-              {status === "active" ? "Ends" : "Starts"} {formatDate(status === "active" ? endDate : startDate)}
+              {status === "active" ? "Ends" : "Starts"} {status === "active" ? endDate : startDate}
             </span>
           </div>
         </div>
@@ -126,12 +106,12 @@ export function BattleCard({
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center space-x-1">
             <Calendar className="h-4 w-4" />
-            <span className="font-rajdhani">{formatDate(startDate)}</span>
+            <span className="font-rajdhani">{startDate}</span>
           </div>
           <span className="font-rajdhani">to</span>
           <div className="flex items-center space-x-1">
             <Calendar className="h-4 w-4" />
-            <span className="font-rajdhani">{formatDate(endDate)}</span>
+            <span className="font-rajdhani">{endDate}</span>
           </div>
         </div>
 

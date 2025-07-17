@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, Suspense } from "react";
+import { Await, Link, useLoaderData } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { BattleCard } from "@/components/BattleCard";
-import { 
-  Trophy, 
-  Users, 
-  Clock, 
-  Zap, 
-  Target, 
-  Star, 
+import {
+  Trophy,
+  Users,
+  Clock,
+  Zap,
+  Target,
+  Star,
   ArrowRight,
-  PlayCircle 
+  PlayCircle
 } from "lucide-react";
 import heroImage from "@/assets/hero-gaming.jpg";
+import { FeaturedDeal } from "@/types";
 
 // Mock data for demonstration
 const mockStats = {
@@ -80,6 +81,52 @@ const testimonials = [
   }
 ];
 
+function FeaturedDeals() {
+  const { featured } = useLoaderData();
+
+  return (
+    <Suspense>
+      <Await
+        resolve={featured}
+        errorElement={
+          <div>Error getting featuerd</div>
+        }
+        children={(resolvedFeaturedItems: FeaturedDeal[]) => {
+          return (
+            <section className="py-20">
+              <div className="container mx-auto px-4">
+                <div className="text-center mb-12">
+                  <h2 className="font-orbitron font-bold text-4xl md:text-5xl mb-4">
+                    FEATURED <span className="text-gradient">BATTLES</span>
+                  </h2>
+                  <p className="font-rajdhani text-xl text-muted-foreground">
+                    Join the most exciting challenges and earn massive rewards
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                  {resolvedFeaturedItems.map((battle) => (
+                    <BattleCard key={battle.id} {...battle} />
+                  ))}
+                </div>
+
+                <div className="text-center">
+                  <Link to="/battles">
+                    <Button size="lg" className="btn-neon font-rajdhani font-bold">
+                      View All Battles
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </section>
+          );
+        }}
+      />
+    </Suspense>
+  );
+}
+
 export function LandingPage() {
   const [typedText, setTypedText] = useState("");
   const fullText = "Play. Earn. Repeat.";
@@ -118,7 +165,7 @@ export function LandingPage() {
             <span className="text-gradient">{typedText}</span>
             <span className="animate-pulse">|</span>
           </h1>
-          
+
           <p className="font-rajdhani text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             The ultimate Web3 gaming platform where developers create challenges and players earn real rewards for completing blockchain-based quests.
           </p>
@@ -216,33 +263,7 @@ export function LandingPage() {
       </section>
 
       {/* Featured Battles */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="font-orbitron font-bold text-4xl md:text-5xl mb-4">
-              FEATURED <span className="text-gradient">BATTLES</span>
-            </h2>
-            <p className="font-rajdhani text-xl text-muted-foreground">
-              Join the most exciting challenges and earn massive rewards
-            </p>
-          </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {mockFeaturedBattles.map((battle) => (
-              <BattleCard key={battle.id} {...battle} />
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Link to="/battles">
-              <Button size="lg" className="btn-neon font-rajdhani font-bold">
-                View All Battles
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* Testimonials */}
       <section className="py-20 bg-card">
