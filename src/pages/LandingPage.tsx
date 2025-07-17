@@ -24,42 +24,6 @@ const mockStats = {
   totalPlayers: "75K"
 };
 
-const mockFeaturedBattles = [
-  {
-    id: 1,
-    name: "Viking Warrior Challenge",
-    image: "/lovable-uploads/ce11f41d-57a8-4a0a-8bc1-3dc66db8c318.png",
-    reward: 5.5,
-    playerCount: 245,
-    maxPlayers: 500,
-    startDate: "2024-01-15",
-    endDate: "2024-02-15",
-    status: "active" as const,
-  },
-  {
-    id: 2,
-    name: "Champions League Quest",
-    image: "/lovable-uploads/62fb7c52-a279-4f8c-bdb5-65b1c244f2bc.png",
-    reward: 3.2,
-    playerCount: 89,
-    maxPlayers: 200,
-    startDate: "2024-01-20",
-    endDate: "2024-02-20",
-    status: "upcoming" as const,
-  },
-  {
-    id: 3,
-    name: "Treasure Hunt Expedition",
-    image: "/lovable-uploads/5d0f9609-6bf9-45db-bfde-86e1441e22b5.png",
-    reward: 7.8,
-    playerCount: 156,
-    maxPlayers: 300,
-    startDate: "2024-01-10",
-    endDate: "2024-01-31",
-    status: "active" as const,
-  },
-];
-
 const testimonials = [
   {
     name: "Alex Chen",
@@ -85,41 +49,19 @@ function FeaturedDeals() {
   const { featured } = useLoaderData();
 
   return (
-    <Suspense>
+    <Suspense fallback={<div>Getting featured deals...</div>}>
       <Await
         resolve={featured}
         errorElement={
-          <div>Error getting featuerd</div>
+          <div>Error getting featured deals</div>
         }
         children={(resolvedFeaturedItems: FeaturedDeal[]) => {
           return (
-            <section className="py-20">
-              <div className="container mx-auto px-4">
-                <div className="text-center mb-12">
-                  <h2 className="font-orbitron font-bold text-4xl md:text-5xl mb-4">
-                    FEATURED <span className="text-gradient">BATTLES</span>
-                  </h2>
-                  <p className="font-rajdhani text-xl text-muted-foreground">
-                    Join the most exciting challenges and earn massive rewards
-                  </p>
-                </div>
-
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                  {resolvedFeaturedItems.map((battle) => (
-                    <BattleCard key={battle.id} {...battle} />
-                  ))}
-                </div>
-
-                <div className="text-center">
-                  <Link to="/battles">
-                    <Button size="lg" className="btn-neon font-rajdhani font-bold">
-                      View All Battles
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </section>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              {resolvedFeaturedItems.map((battle) => (
+                <BattleCard key={battle.id} {...battle} />
+              ))}
+            </div>
           );
         }}
       />
@@ -263,6 +205,29 @@ export function LandingPage() {
       </section>
 
       {/* Featured Battles */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="font-orbitron font-bold text-4xl md:text-5xl mb-4">
+              FEATURED <span className="text-gradient">BATTLES</span>
+            </h2>
+            <p className="font-rajdhani text-xl text-muted-foreground">
+              Join the most exciting challenges and earn massive rewards
+            </p>
+          </div>
+
+          <FeaturedDeals />
+
+          <div className="text-center">
+            <Link to="/battles">
+              <Button size="lg" className="btn-neon font-rajdhani font-bold">
+                View All Battles
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
 
 
       {/* Testimonials */}
