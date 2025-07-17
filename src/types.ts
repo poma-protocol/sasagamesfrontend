@@ -28,7 +28,7 @@ export const featuredDealsSchema = z.object({
     maxPlayers: z.number(),
     startDate: z.string(),
     endDate: z.string(),
-    status: z.string()
+    status: z.enum(["upcoming", "active", "completed"])
 });
 
 export type FeaturedDeal = z.infer<typeof featuredDealsSchema>;

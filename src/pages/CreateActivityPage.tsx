@@ -2,61 +2,117 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Target, Calendar, Trophy, Users } from "lucide-react";
+import { Target, Calendar, Trophy, Users, Upload } from "lucide-react";
 import { toast } from "sonner";
+import { API_CONFIG } from "@/config";
 
 const activitySchema = z.object({
+  challenge_id: z.number().min(1, "Challenge ID is required"),
+  goal: z.number().min(1, "Goal is required"),
+  reward: z.number().min(0, "Reward must be non-negative").optional(),
   name: z.string().min(1, "Activity name is required"),
-  description: z.string().min(1, "Description is required"),
-  gameId: z.string().min(1, "Game selection is required"),
-  difficulty: z.enum(["easy", "medium", "hard", "expert"]),
-  points: z.number().min(1, "Points must be at least 1"),
-  maxParticipants: z.number().min(1, "Max participants must be at least 1"),
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().min(1, "End date is required"),
-  isActive: z.boolean(),
-  requirements: z.string().optional(),
-  rewards: z.string().optional(),
+  image: z.string().min(1, "Image is required"),
+  about: z.string().optional(),
+  instructions: z.array(z.string()).optional(),
+  maximum_num_players: z.number().min(1, "Maximum players must be at least 1"),
 });
 
 type ActivityFormData = z.infer<typeof activitySchema>;
 
 export function CreateActivityPage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [instructions, setInstructions] = useState<string[]>([]);
+
   const form = useForm<ActivityFormData>({
     resolver: zodResolver(activitySchema),
     defaultValues: {
+      challenge_id: 0,
+      goal: 1,
+      reward: 0,
       name: "",
-      description: "",
-      gameId: "",
-      difficulty: "medium",
-      points: 100,
-      maxParticipants: 100,
       startDate: "",
       endDate: "",
-      isActive: true,
-      requirements: "",
-      rewards: "",
+      image: "",
+      about: "",
+      instructions: [],
+      maximum_num_players: 100,
     },
   });
 
-  const mockGames = [
-    { id: "1", name: "Zombie Apocalypse" },
-    { id: "2", name: "Racing Championship" },
-    { id: "3", name: "Treasure Hunt" },
+  const mockChallenges = [
+    { id: 1, name: "Zombie Apocalypse - Survive 100 Waves" },
+    { id: 2, name: "Racing Championship - Win 5 Races" },
+    { id: 3, name: "Treasure Hunt - Find 10 Treasures" },
   ];
 
-  const onSubmit = (data: ActivityFormData) => {
-    console.log("Creating activity:", data);
-    toast.success("Activity created successfully!");
-    // In real app, this would call the API
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      // For now, we'll use a placeholder URL
+      form.setValue("image", URL.createObjectURL(file));
+    }
+  };
+
+  const addInstruction = () => {
+    const newInstructions = [...instructions, ""];
+    setInstructions(newInstructions);
+    form.setValue("instructions", newInstructions);
+  };
+
+  const updateInstruction = (index: number, value: string) => {
+    const newInstructions = [...instructions];
+    newInstructions[index] = value;
+    setInstructions(newInstructions);
+    form.setValue("instructions", newInstructions);
+  };
+
+  const removeInstruction = (index: number) => {
+    const newInstructions = instructions.filter((_, i) => i !== index);
+    setInstructions(newInstructions);
+    form.setValue("instructions", newInstructions);
+  };
+
+  const onSubmit = async (data: ActivityFormData) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_CONFIG.BACKEND_URL}/activity/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...data,
+          instructions: instructions.filter(instruction => instruction.trim() !== ''),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create activity');
+      }
+
+      const result = await response.json();
+      console.log("Activity created with ID:", result.id);
+      toast.success("Activity created successfully!");
+      form.reset();
+      setInstructions([]);
+      setImageFile(null);
+    } catch (error) {
+      console.error("Error creating activity:", error);
+      toast.error("Failed to create activity. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -160,20 +216,20 @@ export function CreateActivityPage() {
 
                       <FormField
                         control={form.control}
-                        name="gameId"
+                        name="challenge_id"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Game</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
+                            <FormLabel>Challenge</FormLabel>
+                            <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Select a game" />
+                                  <SelectValue placeholder="Select a challenge" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {mockGames.map((game) => (
-                                  <SelectItem key={game.id} value={game.id}>
-                                    {game.name}
+                                {mockChallenges.map((challenge) => (
+                                  <SelectItem key={challenge.id} value={challenge.id.toString()}>
+                                    {challenge.name}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
@@ -186,10 +242,10 @@ export function CreateActivityPage() {
 
                     <FormField
                       control={form.control}
-                      name="description"
+                      name="about"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Description</FormLabel>
+                          <FormLabel>About (Optional)</FormLabel>
                           <FormControl>
                             <Textarea 
                               placeholder="Describe the activity and what players need to do..." 
@@ -210,46 +266,14 @@ export function CreateActivityPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <FormField
                         control={form.control}
-                        name="difficulty"
+                        name="goal"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Difficulty</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="easy">
-                                  <span className="text-green-400">Easy</span>
-                                </SelectItem>
-                                <SelectItem value="medium">
-                                  <span className="text-yellow-400">Medium</span>
-                                </SelectItem>
-                                <SelectItem value="hard">
-                                  <span className="text-orange-400">Hard</span>
-                                </SelectItem>
-                                <SelectItem value="expert">
-                                  <span className="text-red-400">Expert</span>
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="points"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Points Reward</FormLabel>
+                            <FormLabel>Goal</FormLabel>
                             <FormControl>
                               <Input 
                                 type="number" 
-                                placeholder="100" 
+                                placeholder="e.g., 100" 
                                 {...field}
                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                               />
@@ -261,10 +285,30 @@ export function CreateActivityPage() {
 
                       <FormField
                         control={form.control}
-                        name="maxParticipants"
+                        name="reward"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Max Participants</FormLabel>
+                            <FormLabel>Reward (ETH, Optional)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                step="0.001"
+                                placeholder="0.1" 
+                                {...field}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="maximum_num_players"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Max Players</FormLabel>
                             <FormControl>
                               <Input 
                                 type="number" 
@@ -310,66 +354,72 @@ export function CreateActivityPage() {
                     </div>
                   </div>
 
-                  {/* Additional Details */}
+                  {/* Image Upload */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold font-rajdhani">Additional Details</h3>
+                    <h3 className="text-lg font-semibold font-rajdhani">Activity Image</h3>
                     
                     <FormField
                       control={form.control}
-                      name="requirements"
+                      name="image"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Requirements (Optional)</FormLabel>
+                          <FormLabel>Activity Image</FormLabel>
                           <FormControl>
-                            <Textarea 
-                              placeholder="Any specific requirements for participating..." 
-                              {...field} 
-                            />
+                            <div className="flex items-center space-x-4">
+                              <Input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="flex-1"
+                              />
+                              <Upload className="h-5 w-5 text-muted-foreground" />
+                            </div>
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="rewards"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Additional Rewards (Optional)</FormLabel>
-                          <FormControl>
-                            <Textarea 
-                              placeholder="Additional rewards or prizes..." 
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="isActive"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center space-x-2">
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <FormLabel>Activate immediately</FormLabel>
                         </FormItem>
                       )}
                     />
                   </div>
 
+                  {/* Instructions */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold font-rajdhani">Instructions (Optional)</h3>
+                    
+                    <div className="space-y-2">
+                      {instructions.map((instruction, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <Input
+                            value={instruction}
+                            onChange={(e) => updateInstruction(index, e.target.value)}
+                            placeholder={`Instruction ${index + 1}`}
+                            className="flex-1"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeInstruction(index)}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={addInstruction}
+                      >
+                        Add Instruction
+                      </Button>
+                    </div>
+                  </div>
+
                   <Button 
                     type="submit"
+                    disabled={isLoading}
                     className="w-full text-lg py-6 bg-gradient-to-r from-primary to-primary-end hover:opacity-90 transition-opacity"
                   >
-                    CREATE ACTIVITY
+                    {isLoading ? "CREATING..." : "CREATE ACTIVITY"}
                   </Button>
                 </form>
               </Form>
