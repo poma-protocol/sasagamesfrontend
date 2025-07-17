@@ -26,7 +26,7 @@ export function AdminLoginPage() {
         title: "Login Successful",
         description: "Welcome back, admin!",
       });
-      navigate("/manage-games");
+      navigate("/admin/register-game");
     } else {
       toast({
         title: "Login Failed",
