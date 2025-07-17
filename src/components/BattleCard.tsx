@@ -2,6 +2,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { FeaturedDeal } from "@/types";
 import { Calendar, Users, Trophy, Clock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -16,31 +17,12 @@ interface BattleCardProps {
   endDate: string;
   status: "upcoming" | "active" | "completed";
   onJoin?: (id: number) => void;
-  onView?: (id: number) => void;
 }
 
-export function BattleCard({
-  id,
-  name,
-  image,
-  reward,
-  playerCount,
-  maxPlayers,
-  startDate,
-  endDate,
-  status,
-  onJoin,
-  onView,
-}: BattleCardProps) {
-  const navigate = useNavigate();
+const ACTIVITY_IMAGE_URL = import.meta.env.VITE_ACTIVITY_IMAGE_URL;
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
+export function BattleCard(props: FeaturedDeal) {
+  const navigate = useNavigate();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -56,17 +38,17 @@ export function BattleCard({
   };
 
   const handleCardClick = () => {
-    navigate(`/battles/${id}`);
+    navigate(`/battles/${props.id}`);
   };
 
   const handleButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     
-    if (status === "active" && onJoin) {
-      onJoin(id);
+    if (status === "active") {
+      console.log("Joining");
     } else {
-      navigate(`/battles/${id}`);
+      navigate(`/battles/${props.id}`);
     }
   };
 
@@ -75,8 +57,8 @@ export function BattleCard({
       <CardHeader className="p-0">
         <div className="relative overflow-hidden rounded-t-lg">
           <img
-            src={image}
-            alt={name}
+            src={`${ACTIVITY_IMAGE_URL}/${props.image}`}
+            alt={props.name}
             className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -84,17 +66,17 @@ export function BattleCard({
           {/* Status Badge */}
           <Badge
             className={`absolute top-3 right-3 font-rajdhani font-semibold text-white ${getStatusColor(
-              status
+              props.status
             )}`}
           >
-            {status.toUpperCase()}
+            {props.status.toUpperCase()}
           </Badge>
 
           {/* Reward */}
           <div className="absolute bottom-3 left-3 flex items-center space-x-2">
             <Trophy className="h-5 w-5 text-yellow-400" />
             <span className="font-orbitron font-bold text-white text-lg">
-              {reward} ETH
+              {props.reward} ETH
             </span>
           </div>
         </div>
@@ -103,7 +85,7 @@ export function BattleCard({
       <CardContent className="p-6 space-y-4">
         {/* Battle Name */}
         <h3 className="font-orbitron font-bold text-xl text-foreground group-hover:text-accent transition-colors">
-          {name}
+          {props.name}
         </h3>
 
         {/* Stats Grid */}
@@ -111,13 +93,13 @@ export function BattleCard({
           <div className="flex items-center space-x-2 text-muted-foreground">
             <Users className="h-4 w-4" />
             <span className="font-rajdhani">
-              {playerCount}/{maxPlayers}
+              {props.playerCount}/{props.maxPlayers}
             </span>
           </div>
           <div className="flex items-center space-x-2 text-muted-foreground">
             <Clock className="h-4 w-4" />
             <span className="font-rajdhani text-sm">
-              {status === "active" ? "Ends" : "Starts"} {formatDate(status === "active" ? endDate : startDate)}
+              {status === "active" ? "Ends" : "Starts"} {status === "active" ? props.endDate : props.startDate}
             </span>
           </div>
         </div>
@@ -126,12 +108,12 @@ export function BattleCard({
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center space-x-1">
             <Calendar className="h-4 w-4" />
-            <span className="font-rajdhani">{formatDate(startDate)}</span>
+            <span className="font-rajdhani">{props.startDate}</span>
           </div>
           <span className="font-rajdhani">to</span>
           <div className="flex items-center space-x-1">
             <Calendar className="h-4 w-4" />
-            <span className="font-rajdhani">{formatDate(endDate)}</span>
+            <span className="font-rajdhani">{props.endDate}</span>
           </div>
         </div>
 
@@ -141,12 +123,12 @@ export function BattleCard({
           className={`w-full font-rajdhani font-semibold ${
             status === "active" ? "btn-gradient" : "btn-neon"
           }`}
-          disabled={status === "completed" || playerCount >= maxPlayers}
+          disabled={status === "completed" || props.playerCount >= props.maxPlayers}
         >
           {status === "completed"
             ? "View Results"
             : status === "active"
-            ? playerCount >= maxPlayers
+            ? props.playerCount >= props.maxPlayers
               ? "Battle Full"
               : "Join Battle"
             : "View Battle"}

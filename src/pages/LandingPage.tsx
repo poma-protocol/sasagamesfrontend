@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, Suspense } from "react";
+import { Await, Link, useLoaderData } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { BattleCard } from "@/components/BattleCard";
-import { 
-  Trophy, 
-  Users, 
-  Clock, 
-  Zap, 
-  Target, 
-  Star, 
+import {
+  Trophy,
+  Users,
+  Clock,
+  Zap,
+  Target,
+  Star,
   ArrowRight,
-  PlayCircle 
+  PlayCircle
 } from "lucide-react";
 import heroImage from "@/assets/hero-gaming.jpg";
+import { FeaturedDeal } from "@/types";
 
 // Mock data for demonstration
 const mockStats = {
@@ -22,42 +23,6 @@ const mockStats = {
   activeBattles: 42,
   totalPlayers: "75K"
 };
-
-const mockFeaturedBattles = [
-  {
-    id: 1,
-    name: "Viking Warrior Challenge",
-    image: "/lovable-uploads/ce11f41d-57a8-4a0a-8bc1-3dc66db8c318.png",
-    reward: 5.5,
-    playerCount: 245,
-    maxPlayers: 500,
-    startDate: "2024-01-15",
-    endDate: "2024-02-15",
-    status: "active" as const,
-  },
-  {
-    id: 2,
-    name: "Champions League Quest",
-    image: "/lovable-uploads/62fb7c52-a279-4f8c-bdb5-65b1c244f2bc.png",
-    reward: 3.2,
-    playerCount: 89,
-    maxPlayers: 200,
-    startDate: "2024-01-20",
-    endDate: "2024-02-20",
-    status: "upcoming" as const,
-  },
-  {
-    id: 3,
-    name: "Treasure Hunt Expedition",
-    image: "/lovable-uploads/5d0f9609-6bf9-45db-bfde-86e1441e22b5.png",
-    reward: 7.8,
-    playerCount: 156,
-    maxPlayers: 300,
-    startDate: "2024-01-10",
-    endDate: "2024-01-31",
-    status: "active" as const,
-  },
-];
 
 const testimonials = [
   {
@@ -79,6 +44,45 @@ const testimonials = [
     avatar: "/api/placeholder/60/60"
   }
 ];
+
+function FeaturedDeals() {
+  //@ts-ignore
+  const { featured } = useLoaderData(); // Shows error but is how the docs did it
+
+  const loadingElement = <div className="font-rajdhani text-xl md:text-2xl text-muted-foreground mb-8 text-center">
+    Getting featured deals...
+  </div>;
+
+  const errorElement = <div className="font-rajdhani text-xl md:text-2xl text-muted-foreground mb-8 text-center">
+    Could not get featured deals
+  </div>
+
+  const noFeaturedDeals = <div className="font-rajdhani text-xl md:text-2xl text-muted-foreground mb-8 text-center">
+    No featured deals
+  </div>
+
+  return (
+    <Suspense fallback={loadingElement}>
+      <Await
+        resolve={featured}
+        errorElement={errorElement}
+        children={(resolvedFeaturedItems: FeaturedDeal[]) => {
+          if (resolvedFeaturedItems.length <= 0) {
+            return noFeaturedDeals
+          }
+
+          return (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              {resolvedFeaturedItems.map((battle) => (
+                <BattleCard key={battle.id} {...battle} />
+              ))}
+            </div>
+          );
+        }}
+      />
+    </Suspense>
+  );
+}
 
 export function LandingPage() {
   const [typedText, setTypedText] = useState("");
@@ -118,7 +122,7 @@ export function LandingPage() {
             <span className="text-gradient">{typedText}</span>
             <span className="animate-pulse">|</span>
           </h1>
-          
+
           <p className="font-rajdhani text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             The ultimate Web3 gaming platform where developers create challenges and players earn real rewards for completing blockchain-based quests.
           </p>
@@ -227,11 +231,7 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {mockFeaturedBattles.map((battle) => (
-              <BattleCard key={battle.id} {...battle} />
-            ))}
-          </div>
+          <FeaturedDeals />
 
           <div className="text-center">
             <Link to="/battles">
@@ -243,6 +243,7 @@ export function LandingPage() {
           </div>
         </div>
       </section>
+
 
       {/* Testimonials */}
       <section className="py-20 bg-card">
