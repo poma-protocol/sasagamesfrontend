@@ -60,6 +60,16 @@ export const filteredGamesSchema = z.object({
   createdAt: z.string()
 });
 
+export const gameChallengesSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    function_name: z.string(),
+    player_address_variable: z.string(),
+    countItems: z.boolean(),
+    battles: z.number()
+});
+
+export type GamesChallenges = z.infer<typeof gameChallengesSchema>;
 export type FilteredGames = z.infer<typeof filteredGamesSchema>;
 export type GameCategories = z.infer<typeof gameAndCategoriesSchema>;
 export type FeaturedDeal = z.infer<typeof featuredDealsSchema>;

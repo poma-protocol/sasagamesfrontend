@@ -6,12 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Settings, Eye, Search, Filter, Users, Zap, Trophy, TrendingUp, Gamepad2 } from "lucide-react";
-import { FilteredGames, filteredGamesSchema } from "@/types";
+import { Plus, Settings, Eye, Search, Filter, Users, Zap, Gamepad2 } from "lucide-react";
+import { FilteredGames, filteredGamesSchema, gameChallengesSchema, GamesChallenges } from "@/types";
 import { toast } from "sonner";
 import axios from "axios";
 
 const VITE_BACKEND = import.meta.env.VITE_BACKEND_URL;
+const ACTIVITY_IMAGE_URL = import.meta.env.VITE_ACTIVITY_IMAGE_URL;
 
 export function ManageGamesPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,6 +21,8 @@ export function ManageGamesPage() {
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedGame, setSelectedGame] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [challengesLoading, setChallengesLoading] = useState<boolean>(false);
+  const [challenges, setChallenges] = useState<GamesChallenges[]>([])
 
   useEffect(() => {
     const getInitialGames = async () => {
@@ -77,32 +80,32 @@ export function ManageGamesPage() {
     }
   }
 
+  async function getChallenges() {
+    try {
+      setChallengesLoading(true);
+
+      const data = await axios.get(`${VITE_BACKEND}/game/challenges/${selectedGame}`);
+      const challengesFromBackend: GamesChallenges[] = [];
+
+      for (const d of data.data) {
+        const parsed = gameChallengesSchema.safeParse(d);
+        if (parsed.success) {
+          challengesFromBackend.push(parsed.data);
+        }
+      }
+
+      setChallenges(challengesFromBackend);
+      setChallengesLoading(false);
+    } catch(err) {
+      setChallengesLoading(false);
+      console.error("Error getting game's challenges", err);
+      toast.error("Error getting game challenges");
+    }
+  }
+
   const handleGameClick = (gameId: number) => {
     setSelectedGame(gameId === selectedGame ? null : gameId);
   };
-
-  const mockChallenges = [
-    {
-      id: 1,
-      name: "Survive 100 Waves",
-      function_name: "completeWave",
-      player_address_variable: "playerAddress",
-      countItems: true,
-      battles: 2,
-      difficulty: "Hard",
-      avgCompletionTime: "45 min"
-    },
-    {
-      id: 2,
-      name: "Collect Power-ups",
-      function_name: "collectPowerup",
-      player_address_variable: "player",
-      countItems: true,
-      battles: 1,
-      difficulty: "Medium",
-      avgCompletionTime: "15 min"
-    }
-  ];
 
   const totalStats = {
     totalGames: games.length,
@@ -223,7 +226,7 @@ export function ManageGamesPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-4">
                     <img
-                      src={game.image}
+                      src={`${ACTIVITY_IMAGE_URL}/${game.image}`}
                       alt={game.name}
                       className="w-24 h-24 rounded-lg object-cover border border-primary/20"
                     />
@@ -291,17 +294,11 @@ export function ManageGamesPage() {
                     </div>
 
                     <div className="space-y-3">
-                      {mockChallenges.map((challenge) => (
+                      {challengesLoading === false ? challenges.map((challenge) => (
                         <div key={challenge.id} className="flex items-center justify-between p-4 bg-secondary/10 rounded-lg border border-secondary/20">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-1">
                               <p className="font-medium font-rajdhani">{challenge.name}</p>
-                              <Badge className="text-xs font-rajdhani" variant={
-                                challenge.difficulty === 'Easy' ? 'secondary' :
-                                  challenge.difficulty === 'Medium' ? 'default' : 'destructive'
-                              }>
-                                {challenge.difficulty}
-                              </Badge>
                             </div>
                             <p className="text-sm text-muted-foreground font-rajdhani">
                               Function: <code className="bg-muted px-1 rounded">{challenge.function_name}</code> •
@@ -320,7 +317,9 @@ export function ManageGamesPage() {
                             </Button>
                           </div>
                         </div>
-                      ))}
+                      )): <div className="text-center my-6">
+                            Getting challenges...
+                        </div>}
                     </div>
                   </div>
                 )}
