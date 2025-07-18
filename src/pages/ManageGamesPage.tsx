@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,60 +7,41 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Settings, Eye, Search, Filter, Users, Zap, Trophy, TrendingUp, Gamepad2 } from "lucide-react";
+import { FilteredGames, filteredGamesSchema } from "@/types";
+import { toast } from "sonner";
+import axios from "axios";
+
+const VITE_BACKEND = import.meta.env.VITE_BACKEND_URL;
 
 export function ManageGamesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-
-  const [games] = useState([
-    {
-      id: 1,
-      name: "Zombie Apocalypse",
-      category: "Action",
-      image: "/api/placeholder/300/200",
-      challenges: 3,
-      activeBattles: 2,
-      totalPlayers: 1250,
-      revenue: 15420,
-      rating: 4.8,
-      status: "active",
-      featured: true,
-      createdAt: "2024-01-15",
-      lastUpdate: "2024-02-10"
-    },
-    {
-      id: 2,
-      name: "Racing Championship",
-      category: "Racing",
-      image: "/api/placeholder/300/200",
-      challenges: 5,
-      activeBattles: 1,
-      totalPlayers: 890,
-      revenue: 8930,
-      rating: 4.6,
-      status: "active",
-      featured: false,
-      createdAt: "2024-01-20",
-      lastUpdate: "2024-02-08"
-    },
-    {
-      id: 3,
-      name: "Treasure Hunt",
-      category: "Adventure",
-      image: "/api/placeholder/300/200",
-      challenges: 2,
-      activeBattles: 0,
-      totalPlayers: 450,
-      revenue: 2340,
-      rating: 4.2,
-      status: "inactive",
-      featured: false,
-      createdAt: "2024-01-10",
-      lastUpdate: "2024-01-25"
-    }
-  ]);
-
+  const [games, setGames] = useState<FilteredGames[]>([]);
   const [selectedGame, setSelectedGame] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const getInitialGames = async () => {
+      try {
+        const data = await axios.get(`${VITE_BACKEND}/game/filter`);
+
+        const parsedGames: FilteredGames[] = [];
+        for (const d of data.data) {
+          const parsed = filteredGamesSchema.safeParse(d);
+          if (parsed.success) {
+            parsedGames.push(parsed.data);
+          }
+        }
+
+        setGames(parsedGames);
+      } catch(err) {
+        console.error("Error getting initial games", err);
+        toast.error("Could not get games");
+      }
+    }
+
+    getInitialGames();
+  }, []);
 
   const handleGameClick = (gameId: number) => {
     setSelectedGame(gameId === selectedGame ? null : gameId);
@@ -99,8 +80,6 @@ export function ManageGamesPage() {
   const totalStats = {
     totalGames: games.length,
     totalPlayers: games.reduce((sum, game) => sum + game.totalPlayers, 0),
-    totalRevenue: games.reduce((sum, game) => sum + game.revenue, 0),
-    avgRating: games.reduce((sum, game) => sum + game.rating, 0) / games.length
   };
 
   return (
@@ -137,7 +116,7 @@ export function ManageGamesPage() {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -158,30 +137,6 @@ export function ManageGamesPage() {
                   <p className="text-3xl font-bold font-orbitron text-accent">{totalStats.totalPlayers.toLocaleString()}</p>
                 </div>
                 <Users className="h-8 w-8 text-accent/60" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground font-rajdhani">Revenue</p>
-                  <p className="text-3xl font-bold font-orbitron text-green-400">${totalStats.totalRevenue.toLocaleString()}</p>
-                </div>
-                <TrendingUp className="h-8 w-8 text-green-400/60" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-primary/20 bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground font-rajdhani">Avg Rating</p>
-                  <p className="text-3xl font-bold font-orbitron text-yellow-400">{totalStats.avgRating.toFixed(1)}</p>
-                </div>
-                <Trophy className="h-8 w-8 text-yellow-400/60" />
               </div>
             </CardContent>
           </Card>

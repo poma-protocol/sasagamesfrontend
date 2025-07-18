@@ -19,15 +19,15 @@ export const gameSchema = z.object({
   challenges: z.array(challengeSchema).min(1, "At least one challenge is required"),
 });
 export const featuredDealsSchema = z.object({
-    id: z.number(),
-    name: z.string(),
-    image: z.string(),
-    reward: z.number(),
-    playerCount: z.number(),
-    maxPlayers: z.number(),
-    startDate: z.string(),
-    endDate: z.string(),
-    status: z.enum(["upcoming", "active", "completed"])
+  id: z.number(),
+  name: z.string(),
+  image: z.string(),
+  reward: z.number(),
+  playerCount: z.number(),
+  maxPlayers: z.number(),
+  startDate: z.string(),
+  endDate: z.string(),
+  status: z.enum(["upcoming", "active", "completed"])
 });
 
 export const activitySchema = z.object({
@@ -47,7 +47,20 @@ export const gameAndCategoriesSchema = z.object({
   name: z.string(),
   image: z.string(),
   category: z.string(),
-})
+});
+
+export const filteredGamesSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  category: z.string(),
+  image: z.string(),
+  challenges: z.number(),
+  activeBattles: z.number(),
+  totalPlayers: z.number(),
+  createdAt: z.string()
+});
+
+export type FilteredGames = z.infer<typeof filteredGamesSchema>;
 export type GameCategories = z.infer<typeof gameAndCategoriesSchema>;
 export type FeaturedDeal = z.infer<typeof featuredDealsSchema>;
 export type GameFormData = z.infer<typeof gameSchema>;
