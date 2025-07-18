@@ -31,5 +31,17 @@ export const featuredDealsSchema = z.object({
     status: z.enum(["upcoming", "active", "completed"])
 });
 
+export const activitySchema = z.object({
+  challenge_id: z.number().min(1, "Challenge ID is required"),
+  goal: z.number().min(1, "Goal is required"),
+  reward: z.number().min(0, "Reward must be non-negative").optional(),
+  name: z.string().min(1, "Activity name is required"),
+  startDate: z.string().min(1, "Start date is required"),
+  endDate: z.string().min(1, "End date is required"),
+  image: z.instanceof(File).optional(),
+  about: z.string().optional(),
+  instructions: z.array(z.string()).optional(),
+  maximum_num_players: z.number().min(1, "Maximum players must be at least 1"),
+});
 export type FeaturedDeal = z.infer<typeof featuredDealsSchema>;
 export type GameFormData = z.infer<typeof gameSchema>;

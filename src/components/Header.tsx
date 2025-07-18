@@ -81,6 +81,13 @@ export function Header() {
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild>
+                                        <Link to="/admin/create-activity" className="flex items-center">
+                                            <Plus className="h-4 w-4 mr-2" />
+                                            Create Activity
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem asChild>
                                         <Link to="/my-battles" className="flex items-center">
                                             <Zap className="h-4 w-4 mr-2" />
                                             My Battles
@@ -151,6 +158,13 @@ export function Header() {
                                         onClick={() => setIsMenuOpen(false)}
                                     >
                                         Register Game
+                                    </Link>
+                                     <Link
+                                        to="/admin/register-game"
+                                        className="block font-rajdhani font-medium text-foreground hover:text-accent"
+                                        onClick={() => setIsMenuOpen(false)}
+                                    >
+                                      Create Activity
                                     </Link>
                                     <button
                                         onClick={() => {
