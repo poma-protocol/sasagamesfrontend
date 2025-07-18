@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Settings, Eye, Edit, Trash2, Search, Filter, Users, Zap, Trophy, TrendingUp, Gamepad2 } from "lucide-react";
+import { Plus, Settings, Eye, Search, Filter, Users, Zap, Trophy, TrendingUp, Gamepad2 } from "lucide-react";
 
 export function ManageGamesPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -244,22 +244,12 @@ export function ManageGamesPage() {
                     <div>
                       <CardTitle className="text-xl font-orbitron flex items-center gap-2">
                         {game.name}
-                        {game.featured && (
-                          <Badge className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-300 border-yellow-500/30">
-                            ⭐ Featured
-                          </Badge>
-                        )}
                       </CardTitle>
                       <CardDescription className="flex items-center gap-2 mt-2">
                         <Badge variant="secondary" className="font-rajdhani">{game.category}</Badge>
-                        <Badge variant={game.status === "active" ? "default" : "outline"} className="font-rajdhani">
-                          {game.status}
-                        </Badge>
-                        <span className="text-yellow-400">★ {game.rating}</span>
                       </CardDescription>
                       <p className="text-sm text-muted-foreground mt-1 font-rajdhani">
-                        Created: {new Date(game.createdAt).toLocaleDateString()} • 
-                        Updated: {new Date(game.lastUpdate).toLocaleDateString()}
+                        Created: {new Date(game.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
@@ -273,20 +263,12 @@ export function ManageGamesPage() {
                       <Eye className="h-4 w-4 mr-2" />
                       {selectedGame === game.id ? "Hide" : "View"}
                     </Button>
-                    <Button variant="outline" size="sm" className="font-rajdhani">
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit
-                    </Button>
-                    <Button variant="outline" size="sm" className="font-rajdhani text-red-400 hover:text-red-300">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
-                    </Button>
                   </div>
                 </div>
               </CardHeader>
 
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                   <div className="text-center">
                     <p className="text-2xl font-bold text-primary font-orbitron">{game.challenges}</p>
                     <p className="text-sm text-muted-foreground font-rajdhani">Activities</p>
@@ -298,14 +280,6 @@ export function ManageGamesPage() {
                   <div className="text-center">
                     <p className="text-2xl font-bold text-yellow-400 font-orbitron">{game.totalPlayers}</p>
                     <p className="text-sm text-muted-foreground font-rajdhani">Players</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-green-400 font-orbitron">${game.revenue}</p>
-                    <p className="text-sm text-muted-foreground font-rajdhani">Revenue</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-purple-400 font-orbitron">{game.rating}</p>
-                    <p className="text-sm text-muted-foreground font-rajdhani">Rating</p>
                   </div>
                 </div>
 
@@ -346,7 +320,7 @@ export function ManageGamesPage() {
                             <p className="text-sm text-muted-foreground font-rajdhani">
                               Function: <code className="bg-muted px-1 rounded">{challenge.function_name}</code> • 
                               Player Variable: <code className="bg-muted px-1 rounded">{challenge.player_address_variable}</code> • 
-                              {challenge.battles} battles • Avg time: {challenge.avgCompletionTime}
+                              {challenge.battles} battles
                             </p>
                           </div>
                           <div className="flex items-center gap-2">
