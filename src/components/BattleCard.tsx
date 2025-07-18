@@ -1,30 +1,13 @@
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FeaturedDeal } from "@/types";
 import { Calendar, Users, Trophy, Clock } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-
-interface BattleCardProps {
-  id?: number;
-  name?: string;
-  image?: string;
-  reward?: number;
-  playerCount?: number;
-  maxPlayers?: number;
-  startDate?: string;
-  endDate?: string;
-  status?: "upcoming" | "active" | "completed";
-  onJoin?: (id: number) => void;
-  onView?: (id: number) => void;
-}
+import BattleCardActionButton from "./BattleCardActionButton";
 
 const ACTIVITY_IMAGE_URL = import.meta.env.VITE_ACTIVITY_IMAGE_URL;
 
-export function BattleCard(props: BattleCardProps) {
-  const navigate = useNavigate();
-
+export function BattleCard(props: FeaturedDeal) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -38,25 +21,8 @@ export function BattleCard(props: BattleCardProps) {
     }
   };
 
-  const handleCardClick = () => {
-    if (props.id) {
-      navigate(`/battles/${props.id}`);
-    }
-  };
-
-  const handleButtonClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    
-    if (props.status === "active" && props.id) {
-      props.onJoin?.(props.id);
-    } else if (props.id) {
-      navigate(`/battles/${props.id}`);
-    }
-  };
-
   return (
-    <Card className="game-card group cursor-pointer" onClick={handleCardClick}>
+    <Card className="game-card group cursor-pointer">
       <CardHeader className="p-0">
         <div className="relative overflow-hidden rounded-t-lg">
           <img
@@ -121,21 +87,7 @@ export function BattleCard(props: BattleCardProps) {
         </div>
 
         {/* Action Button */}
-        <Button
-          onClick={handleButtonClick}
-          className={`w-full font-rajdhani font-semibold ${
-            props.status === "active" ? "btn-gradient" : "btn-neon"
-          }`}
-          disabled={props.status === "completed" || (props.playerCount || 0) >= (props.maxPlayers || 0)}
-        >
-          {props.status === "completed"
-            ? "View Results"
-            : props.status === "active"
-            ? (props.playerCount || 0) >= (props.maxPlayers || 0)
-              ? "Battle Full"
-              : "Join Battle"
-            : "View Battle"}
-        </Button>
+        <BattleCardActionButton playerCount={props.playerCount} maxPlayers={props.maxPlayers} id={props.id} status={props.status} />
       </CardContent>
     </Card>
   );

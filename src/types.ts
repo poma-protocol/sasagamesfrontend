@@ -18,7 +18,6 @@ export const gameSchema = z.object({
   image: z.instanceof(File).optional(),
   challenges: z.array(challengeSchema).min(1, "At least one challenge is required"),
 });
-
 export const featuredDealsSchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -43,5 +42,12 @@ export const activitySchema = z.object({
   instructions: z.array(z.string()).optional(),
   maximum_num_players: z.number().min(1, "Maximum players must be at least 1"),
 });
+export const gameAndCategoriesSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  image: z.string(),
+  category: z.string(),
+})
+export type GameCategories = z.infer<typeof gameAndCategoriesSchema>;
 export type FeaturedDeal = z.infer<typeof featuredDealsSchema>;
 export type GameFormData = z.infer<typeof gameSchema>;
