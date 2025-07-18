@@ -7,6 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Lock, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import axios from "axios";
+
+const VITE_BACKEND = import.meta.env.VITE_BACKEND_URL;
 
 export function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -19,8 +22,12 @@ export function AdminLoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simple demo authentication - in real app, this would be proper auth
-    if (email === "admin@sasagames.com" && password === "admin123") {
+    const res = await axios.post(`${VITE_BACKEND}/login`, {
+      email,
+      password
+    });
+
+    if (res.status === 201) {
       localStorage.setItem("isAdminLoggedIn", "true");
       toast({
         title: "Login Successful",
@@ -50,7 +57,7 @@ export function AdminLoginPage() {
             Access the admin dashboard to manage games and battles
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
@@ -68,7 +75,7 @@ export function AdminLoginPage() {
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
@@ -93,7 +100,7 @@ export function AdminLoginPage() {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
-          
+
           <div className="mt-6 p-4 bg-secondary/20 rounded-lg">
             <p className="text-sm text-muted-foreground text-center">
               Demo Credentials:<br />
