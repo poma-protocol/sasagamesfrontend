@@ -17,12 +17,14 @@ export function ManageGamesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [games, setGames] = useState<FilteredGames[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [selectedGame, setSelectedGame] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const getInitialGames = async () => {
       try {
+        setLoading(true);
         const data = await axios.get(`${VITE_BACKEND}/game/filter`);
 
         const parsedGames: FilteredGames[] = [];
@@ -33,8 +35,13 @@ export function ManageGamesPage() {
           }
         }
 
+        const categoriesFromBackend = [...new Set(parsedGames.map((g) => g.category))]
+
+        setLoading(false);
         setGames(parsedGames);
-      } catch(err) {
+        setCategories(categoriesFromBackend);
+      } catch (err) {
+        setLoading(false);
         console.error("Error getting initial games", err);
         toast.error("Could not get games");
       }
@@ -43,16 +50,36 @@ export function ManageGamesPage() {
     getInitialGames();
   }, []);
 
+  async function filterGames() {
+    try {
+      setLoading(true);
+      const data = await axios.get(`${VITE_BACKEND}/game/filter`, {
+        params: {
+          search: searchTerm,
+          category: selectedCategory
+        }
+      });
+
+      const parsedGames: FilteredGames[] = [];
+      for (const d of data.data) {
+        const parsed = filteredGamesSchema.safeParse(d);
+        if (parsed.success) {
+          parsedGames.push(parsed.data);
+        }
+      }
+
+      setLoading(false);
+      setGames(parsedGames);
+    } catch (err) {
+      setLoading(false);
+      console.error("Error filtering games", err);
+      toast.error("Could not filter games");
+    }
+  }
+
   const handleGameClick = (gameId: number) => {
     setSelectedGame(gameId === selectedGame ? null : gameId);
   };
-
-  const filteredGames = games.filter(game => {
-    const matchesSearch = game.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "" || game.category === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
-  });
 
   const mockChallenges = [
     {
@@ -159,25 +186,29 @@ export function ManageGamesPage() {
                   <Input
                     placeholder="Search by game name..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value)
+                      filterGames();
+                    }}
                     className="pl-10 bg-background/50"
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-rajdhani font-medium">Category</label>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <Select value={selectedCategory} onValueChange={(category) => {
+                  setSelectedCategory(category);
+                  filterGames();
+                }}>
                   <SelectTrigger className="bg-background/50">
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
-                    <SelectItem value="Action">Action</SelectItem>
-                    <SelectItem value="Racing">Racing</SelectItem>
-                    <SelectItem value="Adventure">Adventure</SelectItem>
-                    <SelectItem value="Strategy">Strategy</SelectItem>
-                    <SelectItem value="Puzzle">Puzzle</SelectItem>
+                    {categories.map((c) => (
+                      <SelectItem value={c}>{c}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -186,13 +217,13 @@ export function ManageGamesPage() {
         </Card>
 
         <div className="grid gap-6">
-          {filteredGames.map((game) => (
+          {loading === false ? games.map((game) => (
             <Card key={game.id} className="border-primary/20 bg-card/50 backdrop-blur-sm hover:border-primary/40 transition-colors">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-4">
-                    <img 
-                      src={game.image} 
+                    <img
+                      src={game.image}
                       alt={game.name}
                       className="w-24 h-24 rounded-lg object-cover border border-primary/20"
                     />
@@ -258,7 +289,7 @@ export function ManageGamesPage() {
                         </Button>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-3">
                       {mockChallenges.map((challenge) => (
                         <div key={challenge.id} className="flex items-center justify-between p-4 bg-secondary/10 rounded-lg border border-secondary/20">
@@ -266,15 +297,15 @@ export function ManageGamesPage() {
                             <div className="flex items-center gap-3 mb-1">
                               <p className="font-medium font-rajdhani">{challenge.name}</p>
                               <Badge className="text-xs font-rajdhani" variant={
-                                challenge.difficulty === 'Easy' ? 'secondary' : 
-                                challenge.difficulty === 'Medium' ? 'default' : 'destructive'
+                                challenge.difficulty === 'Easy' ? 'secondary' :
+                                  challenge.difficulty === 'Medium' ? 'default' : 'destructive'
                               }>
                                 {challenge.difficulty}
                               </Badge>
                             </div>
                             <p className="text-sm text-muted-foreground font-rajdhani">
-                              Function: <code className="bg-muted px-1 rounded">{challenge.function_name}</code> • 
-                              Player Variable: <code className="bg-muted px-1 rounded">{challenge.player_address_variable}</code> • 
+                              Function: <code className="bg-muted px-1 rounded">{challenge.function_name}</code> •
+                              Player Variable: <code className="bg-muted px-1 rounded">{challenge.player_address_variable}</code> •
                               {challenge.battles} battles
                             </p>
                           </div>
@@ -295,7 +326,9 @@ export function ManageGamesPage() {
                 )}
               </CardContent>
             </Card>
-          ))}
+          )) : <div className="text-center my-6">
+            Getting games...
+          </div>}
         </div>
       </div>
     </div>
