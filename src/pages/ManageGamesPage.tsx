@@ -219,7 +219,7 @@ export function ManageGamesPage() {
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     <SelectItem value="Action">Action</SelectItem>
                     <SelectItem value="Racing">Racing</SelectItem>
                     <SelectItem value="Adventure">Adventure</SelectItem>
@@ -236,7 +236,7 @@ export function ManageGamesPage() {
                     <SelectValue placeholder="All Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Status</SelectItem>
+                    <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="active">Active</SelectItem>
                     <SelectItem value="inactive">Inactive</SelectItem>
                   </SelectContent>
