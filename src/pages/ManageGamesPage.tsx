@@ -11,7 +11,6 @@ import { Plus, Settings, Eye, Edit, Trash2, Search, Filter, Users, Zap, Trophy, 
 export function ManageGamesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("");
 
   const [games] = useState([
     {
@@ -70,9 +69,8 @@ export function ManageGamesPage() {
   const filteredGames = games.filter(game => {
     const matchesSearch = game.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "" || game.category === selectedCategory;
-    const matchesStatus = selectedStatus === "" || game.status === selectedStatus;
     
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch && matchesCategory;
   });
 
   const mockChallenges = [
@@ -198,7 +196,7 @@ export function ManageGamesPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-rajdhani font-medium">Search Games</label>
                 <div className="relative">
@@ -225,20 +223,6 @@ export function ManageGamesPage() {
                     <SelectItem value="Adventure">Adventure</SelectItem>
                     <SelectItem value="Strategy">Strategy</SelectItem>
                     <SelectItem value="Puzzle">Puzzle</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-rajdhani font-medium">Status</label>
-                <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                  <SelectTrigger className="bg-background/50">
-                    <SelectValue placeholder="All Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
