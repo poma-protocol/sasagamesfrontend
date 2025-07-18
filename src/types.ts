@@ -20,15 +20,15 @@ export const gameSchema = z.object({
 });
 
 export const featuredDealsSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  image: z.string(),
-  reward: z.number(),
-  playerCount: z.number(),
-  maxPlayers: z.number(),
-  startDate: z.string(),
-  endDate: z.string(),
-  status: z.string()
+    id: z.number(),
+    name: z.string(),
+    image: z.string(),
+    reward: z.number(),
+    playerCount: z.number(),
+    maxPlayers: z.number(),
+    startDate: z.string(),
+    endDate: z.string(),
+    status: z.enum(["upcoming", "active", "completed"])
 });
 
 export const gameAndCategoriesSchema = z.object({

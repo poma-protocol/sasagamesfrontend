@@ -8,11 +8,16 @@ import {
     arbitrumSepolia
 } from 'wagmi/chains';
 import { _chains } from 'node_modules/@rainbow-me/rainbowkit/dist/config/getDefaultConfig';
-const PROJECT_ID: string = import.meta.env.VITE_PROJECT_ID;
-const environment: string = import.meta.env.VITE_ENVIRONMENT;
-if (!PROJECT_ID) {
-    throw new Error('VITE_PROJECT_ID is not defined in .env file');
-}
+const PROJECT_ID: string = import.meta.env.VITE_PROJECT_ID || 'your_project_id';
+const environment: string = import.meta.env.VITE_ENVIRONMENT || 'staging';
+
+// API Configuration
+export const API_CONFIG = {
+    BACKEND_URL: import.meta.env.VITE_BACKEND_URL || 'https://staging.arbitrum.pomaprotocol.com/api',
+    ACTIVITY_IMAGE_URL: import.meta.env.VITE_ACTIVITY_IMAGE_URL || 'https://staging.arbitrum.pomaprotocol.com/',
+    ENVIRONMENT: environment,
+    PROJECT_ID: PROJECT_ID,
+};
 
 let chains: _chains;
 if (environment === "prod") {

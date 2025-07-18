@@ -1,17 +1,13 @@
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FeaturedDeal } from "@/types";
 import { Calendar, Users, Trophy, Clock } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
 import BattleCardActionButton from "./BattleCardActionButton";
 
 const ACTIVITY_IMAGE_URL = import.meta.env.VITE_ACTIVITY_IMAGE_URL;
 
 export function BattleCard(props: FeaturedDeal) {
-  const navigate = useNavigate();
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -30,8 +26,8 @@ export function BattleCard(props: FeaturedDeal) {
       <CardHeader className="p-0">
         <div className="relative overflow-hidden rounded-t-lg">
           <img
-            src={`${ACTIVITY_IMAGE_URL}/${props.image}`}
-            alt={props.name}
+            src={props.image ? `${ACTIVITY_IMAGE_URL}/${props.image}` : "/placeholder.svg"}
+            alt={props.name || "Battle"}
             className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -39,17 +35,17 @@ export function BattleCard(props: FeaturedDeal) {
           {/* Status Badge */}
           <Badge
             className={`absolute top-3 right-3 font-rajdhani font-semibold text-white ${getStatusColor(
-              props.status
+              props.status || "active"
             )}`}
           >
-            {props.status.toUpperCase()}
+            {(props.status || "active").toUpperCase()}
           </Badge>
 
           {/* Reward */}
           <div className="absolute bottom-3 left-3 flex items-center space-x-2">
             <Trophy className="h-5 w-5 text-yellow-400" />
             <span className="font-orbitron font-bold text-white text-lg">
-              {props.reward} ETH
+              {props.reward || 0} ETH
             </span>
           </div>
         </div>
@@ -58,7 +54,7 @@ export function BattleCard(props: FeaturedDeal) {
       <CardContent className="p-6 space-y-4">
         {/* Battle Name */}
         <h3 className="font-orbitron font-bold text-xl text-foreground group-hover:text-accent transition-colors">
-          {props.name}
+          {props.name || "Battle"}
         </h3>
 
         {/* Stats Grid */}
@@ -66,7 +62,7 @@ export function BattleCard(props: FeaturedDeal) {
           <div className="flex items-center space-x-2 text-muted-foreground">
             <Users className="h-4 w-4" />
             <span className="font-rajdhani">
-              {props.playerCount}/{props.maxPlayers}
+              {props.playerCount || 0}/{props.maxPlayers || 0}
             </span>
           </div>
           <div className="flex items-center space-x-2 text-muted-foreground">
@@ -81,12 +77,12 @@ export function BattleCard(props: FeaturedDeal) {
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center space-x-1">
             <Calendar className="h-4 w-4" />
-            <span className="font-rajdhani">{props.startDate}</span>
+            <span className="font-rajdhani">{props.startDate || ""}</span>
           </div>
           <span className="font-rajdhani">to</span>
           <div className="flex items-center space-x-1">
             <Calendar className="h-4 w-4" />
-            <span className="font-rajdhani">{props.endDate}</span>
+            <span className="font-rajdhani">{props.endDate || ""}</span>
           </div>
         </div>
 
