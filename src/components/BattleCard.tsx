@@ -5,19 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FeaturedDeal } from "@/types";
 import { Calendar, Users, Trophy, Clock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-
-interface BattleCardProps {
-  id: number;
-  name: string;
-  image: string;
-  reward: number;
-  playerCount: number;
-  maxPlayers: number;
-  startDate: string;
-  endDate: string;
-  status: "upcoming" | "active" | "completed";
-  onJoin?: (id: number) => void;
-}
+import BattleCardActionButton from "./BattleCardActionButton";
 
 const ACTIVITY_IMAGE_URL = import.meta.env.VITE_ACTIVITY_IMAGE_URL;
 
@@ -37,23 +25,8 @@ export function BattleCard(props: FeaturedDeal) {
     }
   };
 
-  const handleCardClick = () => {
-    navigate(`/battles/${props.id}`);
-  };
-
-  const handleButtonClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    
-    if (status === "active") {
-      console.log("Joining");
-    } else {
-      navigate(`/battles/${props.id}`);
-    }
-  };
-
   return (
-    <Card className="game-card group cursor-pointer" onClick={handleCardClick}>
+    <Card className="game-card group cursor-pointer">
       <CardHeader className="p-0">
         <div className="relative overflow-hidden rounded-t-lg">
           <img
@@ -99,7 +72,7 @@ export function BattleCard(props: FeaturedDeal) {
           <div className="flex items-center space-x-2 text-muted-foreground">
             <Clock className="h-4 w-4" />
             <span className="font-rajdhani text-sm">
-              {status === "active" ? "Ends" : "Starts"} {status === "active" ? props.endDate : props.startDate}
+              {props.status === "active" ? "Ends" : "Starts"} {props.status === "active" ? props.endDate : props.startDate}
             </span>
           </div>
         </div>
@@ -118,21 +91,7 @@ export function BattleCard(props: FeaturedDeal) {
         </div>
 
         {/* Action Button */}
-        <Button
-          onClick={handleButtonClick}
-          className={`w-full font-rajdhani font-semibold ${
-            status === "active" ? "btn-gradient" : "btn-neon"
-          }`}
-          disabled={status === "completed" || props.playerCount >= props.maxPlayers}
-        >
-          {status === "completed"
-            ? "View Results"
-            : status === "active"
-            ? props.playerCount >= props.maxPlayers
-              ? "Battle Full"
-              : "Join Battle"
-            : "View Battle"}
-        </Button>
+        <BattleCardActionButton playerCount={props.playerCount} maxPlayers={props.maxPlayers} id={props.id} status={props.status} />
       </CardContent>
     </Card>
   );
