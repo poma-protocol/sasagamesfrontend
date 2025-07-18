@@ -123,13 +123,13 @@ export function ManageGamesPage() {
             </div>
           </div>
           <div className="flex gap-3 mt-4 md:mt-0">
-            <Link to="/manage-activities">
+            <Link to="/admin/manage-activities">
               <Button variant="outline" className="font-rajdhani font-semibold">
                 <Settings className="h-4 w-4 mr-2" />
                 MANAGE ACTIVITIES
               </Button>
             </Link>
-            <Link to="/create-game">
+            <Link to="/admin/register-game">
               <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity font-rajdhani font-semibold">
                 <Plus className="h-4 w-4 mr-2" />
                 CREATE GAME
