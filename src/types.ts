@@ -20,16 +20,24 @@ export const gameSchema = z.object({
 });
 
 export const featuredDealsSchema = z.object({
-    id: z.number(),
-    name: z.string(),
-    image: z.string(),
-    reward: z.number(),
-    playerCount: z.number(),
-    maxPlayers: z.number(),
-    startDate: z.string(),
-    endDate: z.string(),
-    status: z.string()
+  id: z.number(),
+  name: z.string(),
+  image: z.string(),
+  reward: z.number(),
+  playerCount: z.number(),
+  maxPlayers: z.number(),
+  startDate: z.string(),
+  endDate: z.string(),
+  status: z.string()
 });
 
+export const gameAndCategoriesSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  image: z.string(),
+  category: z.string(),
+})
+
+export type GameCategories = z.infer<typeof gameAndCategoriesSchema>;
 export type FeaturedDeal = z.infer<typeof featuredDealsSchema>;
 export type GameFormData = z.infer<typeof gameSchema>;
