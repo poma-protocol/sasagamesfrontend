@@ -12,15 +12,16 @@ import { useAccount } from "wagmi";
 
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 interface NextPreviousBattlesProps {
-  page: number
+  page: number,
+  changePageNumber: (increase: boolean) => void;
 }
 
 function NextPreviousBattles(props: NextPreviousBattlesProps) {
   return (
     <div className="flex flex-row items-center justify-center gap-4 mt-8">
-      <Button><ArrowLeft /></Button>
+      <Button onClick={() => props.changePageNumber(false)}><ArrowLeft /></Button>
       <div>{props.page}</div>
-      <Button><ArrowRight /></Button>
+      <Button onClick={() => props.changePageNumber(true)}><ArrowRight /></Button>
     </div>
   );
 }
@@ -95,6 +96,18 @@ export function BattlesPage() {
   }, [address]);
 
 
+  async function changePage(increase: boolean) {
+    if (increase === true) {
+      setPage(page + 1);
+      filterBattles();
+    } else {
+      if (page !== 1) {
+        setPage(page - 1);
+        filterBattles();
+      }
+    }
+  }
+
   async function filterBattles() {
     try {
       setLoading(true);
@@ -106,7 +119,7 @@ export function BattlesPage() {
           game: selectedGame,
           category: selectedCategory,
           status: selectedStatus,
-          rewards: setRewardRange,
+          rewards: rewardRange,
         }
       });
 
@@ -178,9 +191,12 @@ export function BattlesPage() {
               placeholder="Search battles, games, or challenges..."
               className="pl-10 bg-input border-border font-rajdhani"
               value={searchTerm}
-              onChange={(e) => {
+              onBlur={(e) => {
                 setSearchTerm(e.target.value);
                 filterBattles()
+              }}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
               }}
             />
           </div>
@@ -323,7 +339,7 @@ export function BattlesPage() {
           </div>
         )}
 
-        <NextPreviousBattles page={page} />
+        <NextPreviousBattles page={page} changePageNumber={changePage}/>
       </div>
     </div>
   );
