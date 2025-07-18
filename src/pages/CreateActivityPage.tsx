@@ -8,12 +8,21 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Target, Calendar, Trophy, Users, Upload, Gamepad2 } from "lucide-react";
+import { Target, Trophy, Users, Upload, Gamepad2 } from "lucide-react";
+import {Calendar} from "@/components/ui/calendar";
 import { toast } from "sonner";
 import axios from "axios";
 import { API_CONFIG } from "@/config";
 import { activitySchema } from "@/types";
-
+import * as React from "react"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 type ActivityFormData = z.infer<typeof activitySchema>;
 
 interface Game {
@@ -37,7 +46,9 @@ export function CreateActivityPage() {
     const [games, setGames] = useState<Game[]>([]);
     const [challenges, setChallenges] = useState<Challenge[]>([]);
     const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
-
+    const [issue, setIssue] = useState(false);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const form = useForm<ActivityFormData>({
         resolver: zodResolver(activitySchema),
         defaultValues: {
@@ -415,28 +426,93 @@ export function CreateActivityPage() {
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <FormField
-                                                    control={form.control}
                                                     name="startDate"
+                                                    control={form.control}
                                                     render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel>Start Date</FormLabel>
-                                                            <FormControl>
-                                                                <Input type="datetime-local" {...field} />
-                                                            </FormControl>
+                                                        <FormItem className="text-white">
+                                                            <FormLabel className="text-slate-300 block md:inline-block">Start Date *</FormLabel>
+                                                            <Popover>
+                                                                <PopoverTrigger asChild>
+                                                                    <FormControl>
+                                                                        <Button
+                                                                            variant={"outline"}
+                                                                            className={cn(
+                                                                                "w-[240px] pl-3 text-left font-normal text-white",
+                                                                                !field.value && "text-muted-foreground"
+                                                                            )}
+                                                                        >
+                                                                            {field.value ? (
+                                                                                format(field.value, "PPP")
+                                                                            ) : (
+                                                                                <span className="text-white">Pick a date</span>
+                                                                            )}
+                                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50 text-white" />
+                                                                        </Button>
+                                                                    </FormControl>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-auto p-0" align="start">
+                                                                    <Calendar
+                                                                        mode="single"
+                                                                        selected={field.value}
+                                                                        onSelect={field.onChange}
+                                                                        disabled={(date) => {
+                                                                            if (issue === true) {
+                                                                                return true;
+                                                                            }
+
+                                                                            return date < today
+                                                                        }}
+                                                                        captionLayout="dropdown"
+                                                                    />
+                                                                </PopoverContent>
+                                                            </Popover>
                                                             <FormMessage />
                                                         </FormItem>
                                                     )}
                                                 />
 
+
                                                 <FormField
-                                                    control={form.control}
                                                     name="endDate"
+                                                    control={form.control}
                                                     render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel>End Date</FormLabel>
-                                                            <FormControl>
-                                                                <Input type="datetime-local" {...field} />
-                                                            </FormControl>
+                                                        <FormItem className="text-white">
+                                                            <FormLabel className="text-slate-300 block md:inline-block">End date *</FormLabel>
+                                                            <Popover>
+                                                                <PopoverTrigger asChild>
+                                                                    <FormControl>
+                                                                        <Button
+                                                                            variant={"outline"}
+                                                                            className={cn(
+                                                                                "w-[240px] pl-3 text-left font-normal text-white",
+                                                                                !field.value && "text-muted-foreground"
+                                                                            )}
+                                                                        >
+                                                                            {field.value ? (
+                                                                                format(field.value, "PPP")
+                                                                            ) : (
+                                                                                <span className="text-white">Pick a date</span>
+                                                                            )}
+                                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50 text-white" />
+                                                                        </Button>
+                                                                    </FormControl>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-auto p-0" align="start">
+                                                                    <Calendar
+                                                                        mode="single"
+                                                                        selected={field.value}
+                                                                        onSelect={field.onChange}
+                                                                        disabled={(date) => {
+                                                                            if (issue === true) {
+                                                                                return true;
+                                                                            }
+
+                                                                            return date < today
+                                                                        }}
+                                                                        captionLayout="dropdown"
+                                                                    />
+                                                                </PopoverContent>
+                                                            </Popover>
                                                             <FormMessage />
                                                         </FormItem>
                                                     )}
@@ -446,7 +522,7 @@ export function CreateActivityPage() {
 
                                         {/* Image Upload */}
                                         <div className="space-y-4">
-                                            <h3 className="text-lg font-semibold font-rajdhani">Activity Image</h3>
+                                           
 
                                             <FormField
                                                 control={form.control}

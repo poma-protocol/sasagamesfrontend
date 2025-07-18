@@ -33,10 +33,10 @@ export const featuredDealsSchema = z.object({
 export const activitySchema = z.object({
   challenge_id: z.number().min(1, "Challenge ID is required"),
   goal: z.number().min(1, "Goal is required"),
-  reward: z.number().min(0, "Reward must be non-negative").optional(),
+  reward: z.number().min(0, "Reward must be non-negative"),
   name: z.string().min(1, "Activity name is required"),
-  startDate: z.string().min(1, "Start date is required"),
-  endDate: z.string().min(1, "End date is required"),
+  startDate: z.date({ required_error: "Start date is required" }),
+  endDate: z.date({ required_error: "End date is required" }),
   image: z.instanceof(File).optional(),
   about: z.string().optional(),
   instructions: z.array(z.string()).optional(),
