@@ -14,6 +14,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const adminStatus = localStorage.getItem("isAdminLoggedIn");
+    console.log("Admin status", adminStatus);
     setIsAdminLoggedIn(adminStatus === "true");
   }, []);
 
