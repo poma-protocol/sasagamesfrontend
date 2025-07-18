@@ -31,5 +31,13 @@ export const featuredDealsSchema = z.object({
     status: z.enum(["upcoming", "active", "completed"])
 });
 
+export const gameAndCategoriesSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  image: z.string(),
+  category: z.string(),
+})
+
+export type GameCategories = z.infer<typeof gameAndCategoriesSchema>;
 export type FeaturedDeal = z.infer<typeof featuredDealsSchema>;
 export type GameFormData = z.infer<typeof gameSchema>;

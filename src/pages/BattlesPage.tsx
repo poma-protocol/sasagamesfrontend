@@ -1,138 +1,146 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BattleCard } from "@/components/BattleCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, SlidersHorizontal, Trophy } from "lucide-react";
+import { Search, Filter, SlidersHorizontal, Trophy, ArrowLeft, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
+import axios from "axios";
+import { FeaturedDeal, featuredDealsSchema, gameAndCategoriesSchema, GameCategories } from "@/types";
+import { useAccount } from "wagmi";
 
-// Game images mapping
-const gameImages = {
-  "God of War": "/lovable-uploads/ce11f41d-57a8-4a0a-8bc1-3dc66db8c318.png",
-  "FIFA 22": "/lovable-uploads/62fb7c52-a279-4f8c-bdb5-65b1c244f2bc.png",
-  "Pirate Nation": "/lovable-uploads/5d0f9609-6bf9-45db-bfde-86e1441e22b5.png"
-};
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+interface NextPreviousBattlesProps {
+  page: number,
+  changePageNumber: (increase: boolean) => void;
+}
 
-// Mock data for battles
-const mockBattles = [
-  {
-    id: 1,
-    name: "Viking Warrior Challenge",
-    image: gameImages["God of War"],
-    reward: 0.8,
-    playerCount: 245,
-    maxPlayers: 500,
-    startDate: "2024-01-15",
-    endDate: "2024-02-15",
-    status: "active" as const,
-    game: "God of War",
-    category: "Action",
-    challengeName: "Complete Norse Saga"
-  },
-  {
-    id: 2,
-    name: "Champions League Quest",
-    image: gameImages["FIFA 22"],
-    reward: 0.6,
-    playerCount: 189,
-    maxPlayers: 300,
-    startDate: "2024-01-20",
-    endDate: "2024-02-20",
-    status: "active" as const,
-    game: "FIFA 22",
-    category: "Sports",
-    challengeName: "Win Championship"
-  },
-  {
-    id: 3,
-    name: "Treasure Hunt Expedition",
-    image: gameImages["Pirate Nation"],
-    reward: 0.7,
-    playerCount: 156,
-    maxPlayers: 400,
-    startDate: "2024-01-10",
-    endDate: "2024-01-31",
-    status: "active" as const,
-    game: "Pirate Nation",
-    category: "Adventure",
-    challengeName: "Find Golden Treasure"
-  },
-  {
-    id: 4,
-    name: "Legends Championship",
-    image: gameImages["FIFA 22"],
-    reward: 0.5,
-    playerCount: 180,
-    maxPlayers: 250,
-    startDate: "2024-01-08",
-    endDate: "2024-01-25",
-    status: "completed" as const,
-    game: "FIFA 22",
-    category: "Sports",
-    challengeName: "Ultimate Team Battle"
-  },
-  {
-    id: 5,
-    name: "Pirate Fleet Commander",
-    image: gameImages["Pirate Nation"],
-    reward: 0.9,
-    playerCount: 67,
-    maxPlayers: 150,
-    startDate: "2024-01-25",
-    endDate: "2024-02-25",
-    status: "upcoming" as const,
-    game: "Pirate Nation",
-    category: "Strategy",
-    challengeName: "Command Your Fleet"
-  },
-  {
-    id: 6,
-    name: "Ragnarok Challenge",
-    image: gameImages["God of War"],
-    reward: 1.2,
-    playerCount: 234,
-    maxPlayers: 600,
-    startDate: "2024-01-12",
-    endDate: "2024-02-12",
-    status: "upcoming" as const,
-    game: "God of War",
-    category: "Action",
-    challengeName: "Survive Ragnarok"
-  }
-];
+function NextPreviousBattles(props: NextPreviousBattlesProps) {
+  return (
+    <div className="flex flex-row items-center justify-center gap-4 mt-8">
+      <Button onClick={() => props.changePageNumber(false)}><ArrowLeft /></Button>
+      <div>{props.page}</div>
+      <Button onClick={() => props.changePageNumber(true)}><ArrowRight /></Button>
+    </div>
+  );
+}
 
 export function BattlesPage() {
+  const { address } = useAccount();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGame, setSelectedGame] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [rewardRange, setRewardRange] = useState("all");
+  const [games, setGames] = useState<string[]>([]);
+  const [categories, setCategories] = useState<string[]>([])
+  const [page, setPage] = useState<number>(1);
+  const [filteredActivities, setFilteredActivities] = useState<FeaturedDeal[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // Extract unique values for filters
-  const games = [...new Set(mockBattles.map(battle => battle.game))];
-  const categories = [...new Set(mockBattles.map(battle => battle.category))];
+  useEffect(() => {
+    async function getGamesAndCategories() {
+      try {
+        const data = await axios.get(`${VITE_BACKEND_URL}/game`);
+        const res: GameCategories[] = [];
 
-  // Filter battles based on current filters
-  const filteredBattles = mockBattles.filter(battle => {
-    const matchesSearch = battle.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         battle.game.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         battle.challengeName.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesGame = selectedGame === "all" || battle.game === selectedGame;
-    const matchesCategory = selectedCategory === "all" || battle.category === selectedCategory;
-    const matchesStatus = selectedStatus === "all" || battle.status === selectedStatus;
-    
-    const matchesReward = (() => {
-      switch (rewardRange) {
-        case "0-2": return battle.reward >= 0 && battle.reward <= 2;
-        case "2-5": return battle.reward > 2 && battle.reward <= 5;
-        case "5+": return battle.reward > 5;
-        default: return true;
+        for (const d of data.data) {
+          const parsed = gameAndCategoriesSchema.safeParse(d);
+          if (parsed.success) {
+            res.push(parsed.data)
+          }
+        }
+
+
+        const gamesFromBackend = [...new Set(res.map(battle => battle.name))]
+        const categoriesFromBackend = [...new Set(res.map(battle => battle.category))]
+
+        setGames(gamesFromBackend);
+        setCategories(categoriesFromBackend);
+
+      } catch (err) {
+        console.error("Error getting featured deals", err);
+        toast.error("Could not get games and categories");
       }
-    })();
+    }
 
-    return matchesSearch && matchesGame && matchesCategory && matchesStatus && matchesReward;
-  });
+    async function getInitialGames() {
+      try {
+        const data = await axios.get(`${VITE_BACKEND_URL}/activity/filter`, {
+          params: {
+            page
+          }
+        });
+
+        const activities: FeaturedDeal[] = [];
+
+        for (const d of data.data) {
+          const parsed = featuredDealsSchema.safeParse(d);
+          if (parsed.success) {
+            activities.push(d);
+          }
+        }
+
+        setFilteredActivities(activities);
+      } catch (err) {
+        console.error("Error getting initial activities", err);
+        toast.error("Could not get activities")
+      }
+    }
+
+    setLoading(true);
+    getGamesAndCategories();
+    getInitialGames();
+    setLoading(false);
+  }, [address]);
+
+
+  async function changePage(increase: boolean) {
+    if (increase === true) {
+      setPage(page + 1);
+      filterBattles();
+    } else {
+      if (page !== 1) {
+        setPage(page - 1);
+        filterBattles();
+      }
+    }
+  }
+
+  async function filterBattles() {
+    try {
+      setLoading(true);
+
+      const data = await axios.get(`${VITE_BACKEND_URL}/activity/filter`, {
+        params: {
+          page: page,
+          search: searchTerm,
+          game: selectedGame,
+          category: selectedCategory,
+          status: selectedStatus,
+          rewards: rewardRange,
+        }
+      });
+
+      const activities: FeaturedDeal[] = [];
+
+      for (const d of data.data) {
+        const parsed = featuredDealsSchema.safeParse(d);
+        if (parsed.success) {
+          activities.push(d);
+        }
+      }
+
+      setFilteredActivities(activities);
+
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      console.error("Error filtering battles", err);
+      toast.error("Could not filter battles");
+    }
+  }
 
   const handleJoinBattle = (id: number) => {
     // TODO: Implement join battle logic
@@ -145,16 +153,18 @@ export function BattlesPage() {
   };
 
   const clearAllFilters = () => {
+    setPage(1);
     setSearchTerm("");
     setSelectedGame("all");
     setSelectedCategory("all");
     setSelectedStatus("all");
     setRewardRange("all");
+    filterBattles();
   };
 
   const activeFiltersCount = [
     selectedGame !== "all",
-    selectedCategory !== "all", 
+    selectedCategory !== "all",
     selectedStatus !== "all",
     rewardRange !== "all"
   ].filter(Boolean).length;
@@ -181,13 +191,22 @@ export function BattlesPage() {
               placeholder="Search battles, games, or challenges..."
               className="pl-10 bg-input border-border font-rajdhani"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onBlur={(e) => {
+                setSearchTerm(e.target.value);
+                filterBattles()
+              }}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+              }}
             />
           </div>
 
           {/* Filter Controls */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <Select value={selectedGame} onValueChange={setSelectedGame}>
+            <Select value={selectedGame} onValueChange={(game) => {
+              setSelectedGame(game);
+              filterBattles();
+            }}>
               <SelectTrigger className="bg-input border-border font-rajdhani">
                 <SelectValue placeholder="All Games" />
               </SelectTrigger>
@@ -199,7 +218,10 @@ export function BattlesPage() {
               </SelectContent>
             </Select>
 
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <Select value={selectedCategory} onValueChange={(category) => {
+              setSelectedCategory(category);
+              filterBattles();
+            }}>
               <SelectTrigger className="bg-input border-border font-rajdhani">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
@@ -211,7 +233,10 @@ export function BattlesPage() {
               </SelectContent>
             </Select>
 
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <Select value={selectedStatus} onValueChange={(status) => {
+              setSelectedStatus(status);
+              filterBattles()
+            }}>
               <SelectTrigger className="bg-input border-border font-rajdhani">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
@@ -223,7 +248,10 @@ export function BattlesPage() {
               </SelectContent>
             </Select>
 
-            <Select value={rewardRange} onValueChange={setRewardRange}>
+            <Select value={rewardRange} onValueChange={(reward) => {
+              setRewardRange(reward);
+              filterBattles();
+            }}>
               <SelectTrigger className="bg-input border-border font-rajdhani">
                 <SelectValue placeholder="All Rewards" />
               </SelectTrigger>
@@ -256,7 +284,7 @@ export function BattlesPage() {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">
             <h2 className="font-orbitron font-bold text-2xl text-foreground">
-              {filteredBattles.length} Battles Found
+              {filteredActivities.length} Battles Found
             </h2>
             {searchTerm && (
               <Badge variant="outline" className="font-rajdhani">
@@ -264,24 +292,22 @@ export function BattlesPage() {
               </Badge>
             )}
           </div>
-          
+
           <div className="flex items-center space-x-2 text-muted-foreground">
             <Trophy className="h-5 w-5" />
             <span className="font-rajdhani">
-              Total Rewards: {filteredBattles.reduce((sum, battle) => sum + battle.reward, 0).toFixed(1)} ETH
+              Total Rewards: {filteredActivities.reduce((sum, battle) => sum + battle.reward, 0).toFixed(1)} ETH
             </span>
           </div>
         </div>
 
         {/* Battles Grid */}
-        {filteredBattles.length > 0 ? (
+        {loading === false ? filteredActivities.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredBattles.map((battle) => (
+            {filteredActivities.map((battle) => (
               <BattleCard
                 key={battle.id}
                 {...battle}
-                onJoin={handleJoinBattle}
-                onView={handleViewBattle}
               />
             ))}
           </div>
@@ -298,7 +324,22 @@ export function BattlesPage() {
               Clear All Filters
             </Button>
           </div>
+        ) : (
+          <div className="text-center py-16">
+            <Filter className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="font-orbitron font-bold text-2xl text-foreground mb-2">
+              Getting battles
+            </h3>
+            <p className="font-rajdhani text-lg text-muted-foreground mb-6">
+              Battles are loading
+            </p>
+            <Button onClick={clearAllFilters} className="btn-gradient font-rajdhani font-semibold">
+              Clear All Filters
+            </Button>
+          </div>
         )}
+
+        <NextPreviousBattles page={page} changePageNumber={changePage}/>
       </div>
     </div>
   );
