@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAdminLoggedIn } = useAdmin();
 
-  if (false) {
+  if (isAdminLoggedIn == false) {
     return <Navigate to="/admin-login" replace />;
   }
 
