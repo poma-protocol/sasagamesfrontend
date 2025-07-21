@@ -219,7 +219,7 @@ export function ManageActivitiesPage() {
                     <SelectValue placeholder="All Games" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Games</SelectItem>
+                    <SelectItem value="all">All Games</SelectItem>
                     {games.map(game => (
                       <SelectItem key={game} value={game}>{game}</SelectItem>
                     ))}
@@ -234,7 +234,7 @@ export function ManageActivitiesPage() {
                     <SelectValue placeholder="All Difficulties" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Difficulties</SelectItem>
+                    <SelectItem value="all">All Difficulties</SelectItem>
                     <SelectItem value="easy">Easy</SelectItem>
                     <SelectItem value="medium">Medium</SelectItem>
                     <SelectItem value="hard">Hard</SelectItem>
