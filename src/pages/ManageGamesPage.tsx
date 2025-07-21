@@ -80,11 +80,11 @@ export function ManageGamesPage() {
     }
   }
 
-  async function getChallenges() {
+  async function getChallenges(id: number) {
     try {
       setChallengesLoading(true);
 
-      const data = await axios.get(`${VITE_BACKEND}/game/challenges/${selectedGame}`);
+      const data = await axios.get(`${VITE_BACKEND}/game/challenges/${id}`);
       const challengesFromBackend: GamesChallenges[] = [];
 
       for (const d of data.data) {
@@ -104,6 +104,9 @@ export function ManageGamesPage() {
   }
 
   const handleGameClick = (gameId: number) => {
+    if (gameId !== selectedGame) {
+      getChallenges(gameId);
+    }
     setSelectedGame(gameId === selectedGame ? null : gameId);
   };
 
