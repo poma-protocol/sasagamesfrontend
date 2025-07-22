@@ -51,7 +51,7 @@ export default function BattleCardActionButton(props: BattleCardActionButtonProp
             onClick={handleButtonClick}
             className={`w-full font-rajdhani font-semibold ${props.status === "active" ? "btn-gradient" : "btn-neon"
                 }`}
-            disabled={props.status === "completed" || props.playerCount >= props.maxPlayers}
+            // disabled={props.status === "completed" || props.playerCount >= props.maxPlayers}
         >
             {loading == false ? props.status === "completed"
                 ? "View Results"

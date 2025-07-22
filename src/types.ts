@@ -80,6 +80,18 @@ export interface MyBattle {
     userdone: boolean;
     battleDone: boolean;
 }
+export interface Activity {
+    id: number,
+    name: string,
+    reward: number | null,
+    goal: number,
+    image: string,
+    startDate: string,
+    endDate: string,
+    about: string,
+    players: number,
+    instructions: string[]
+}
 
 export type GamesChallenges = z.infer<typeof gameChallengesSchema>;
 export type FilteredGames = z.infer<typeof filteredGamesSchema>;

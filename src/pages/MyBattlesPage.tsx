@@ -35,19 +35,76 @@ export function MyBattlesPage() {
     console.log("User Address:", userAddress);
     console.log("Fetched Battles:", data);
     if (isLoading) {
-        return <div className="flex flex-col space-y-3">
-            <Skeleton className="h-[125px] w-[250px] rounded-xl" />
-            <div className="space-y-2">
-                <Skeleton className="h-4 w-[250px]" />
-                <Skeleton className="h-4 w-[200px]" />
-                <Skeleton className="h-4 w-[250px]" />
-                <Skeleton className="h-4 w-[200px]" />
-                <Skeleton className="h-4 w-[300px]" />
+        return (
+            <div className="flex flex-col space-y-4 w-[250px]">
+                {/* Image placeholder */}
+                <Skeleton className="h-[125px] w-full rounded-lg" />
+
+                {/* Text placeholders with varying widths to simulate content */}
+                <div className="space-y-3">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-4/5" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/5" />
+                    <Skeleton className="h-4 w-5/6" />
+                </div>
+
+                {/* Optional: button placeholder */}
+                <Skeleton className="h-10 w-full rounded-md mt-2" />
             </div>
-        </div>;
+        );
     }
     if (isError) {
-        toast.error("Failed to load battles. Please try again later.");
+        return (
+            <div className="flex flex-col items-center justify-center p-6 rounded-lg bg-transparent min-h-screen dark:bg-red-900/20 border dark:border-red-800 max-w-md mx-auto">
+                {/* Icon */}
+                <div className="mb-4 p-3 rounded-full bg-red-100 dark:bg-red-900/30">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-8 w-8 text-red-500 dark:text-red-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+                </div>
+
+                {/* Title */}
+                <h3 className="text-lg font-medium text-red-800 dark:text-red-200 mb-2">
+                    Failed to Load Battles
+                </h3>
+
+                {/* Description */}
+                <p className="text-red-600 dark:text-red-300 text-center mb-4">
+                    We couldn't retrieve the battle data. This might be a temporary issue.
+                </p>
+
+                {/* Action button */}
+                <button
+                    onClick={() => window.location.reload()}
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                >
+                    Try Again
+                </button>
+
+                {/* Additional help link */}
+                <p className="mt-3 text-sm text-red-500 dark:text-red-400">
+                    Still having trouble?{' '}
+                    <a
+                        href="/help"
+                        className="underline hover:text-red-700 dark:hover:text-red-300"
+                    >
+                        Contact support
+                    </a>
+                </p>
+            </div>
+        );
     }
     const getFilteredBattles = (status: string) => {
         if (!data) return [];

@@ -23,7 +23,7 @@ const router = createBrowserRouter([
     {
          path: "/",
         element: <App />,
-        // errorElement: <NotFound />,
+        errorElement: <NotFound />,
         children: [
             { path: "/", loader: featuredDealsLoader, element: <LandingPage /> },
             { path: "/battles", element: <BattlesPage /> },
