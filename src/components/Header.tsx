@@ -21,7 +21,7 @@ export function Header() {
     ];
 
     const handleAdminLogin = () => {
-        navigate("/admin-login");
+        navigate("/game-admin/login");
     };
 
     const handleAdminLogout = () => {
@@ -68,20 +68,20 @@ export function Header() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-48">
                                     <DropdownMenuItem asChild>
-                                        <Link to="/admin/manage-games" className="flex items-center">
+                                        <Link to="/game-admin/manage-games" className="flex items-center">
                                             <GamepadIcon className="h-4 w-4 mr-2" />
                                             Manage Games
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link to="/admin/register-game" className="flex items-center">
+                                        <Link to="/game-admin/register-game" className="flex items-center">
                                             <Plus className="h-4 w-4 mr-2" />
                                             Register Game
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild>
-                                        <Link to="/admin/create-activity" className="flex items-center">
+                                        <Link to="/game-admin/create-activity" className="flex items-center">
                                             <Plus className="h-4 w-4 mr-2" />
                                             Create Activity
                                         </Link>
@@ -110,7 +110,7 @@ export function Header() {
                                 className="font-rajdhani font-semibold btn-gradient"
                             >
                                 <Settings className="h-4 w-4 mr-2" />
-                                Admin Login
+                                Game admin Login
                             </Button>
                         )}
                     </div>
@@ -146,21 +146,21 @@ export function Header() {
                             {isAdminLoggedIn ? (
                                 <div className="space-y-2 pt-4 border-t border-border">
                                     <Link
-                                        to="/admin/manage-games"
+                                        to="/game-admin/manage-games"
                                         className="block font-rajdhani font-medium text-foreground hover:text-accent"
                                         onClick={() => setIsMenuOpen(false)}
                                     >
                                         Manage Games
                                     </Link>
                                     <Link
-                                        to="/admin/register-game"
+                                        to="/game-admin/register-game"
                                         className="block font-rajdhani font-medium text-foreground hover:text-accent"
                                         onClick={() => setIsMenuOpen(false)}
                                     >
                                         Register Game
                                     </Link>
                                      <Link
-                                        to="/admin/register-game"
+                                        to="/game-admin/register-game"
                                         className="block font-rajdhani font-medium text-foreground hover:text-accent"
                                         onClick={() => setIsMenuOpen(false)}
                                     >
@@ -186,7 +186,7 @@ export function Header() {
                                     className="w-full font-rajdhani font-semibold btn-gradient"
                                 >
                                     <Settings className="h-4 w-4 mr-2" />
-                                    Admin Login
+                                    Game Admin Login
                                 </Button>
                             )}
                         </nav>

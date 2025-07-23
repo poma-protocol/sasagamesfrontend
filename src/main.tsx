@@ -30,11 +30,11 @@ const router = createBrowserRouter([
             { path: "/battles/:id", element: <BattleDetailPage /> },
             { path: "/how-it-works", element: <HowItWorksPage /> },
             { path: "/about", element: <AboutPage /> },
-            { path: "/admin-login", element: <AdminLoginPage /> },
+            { path: "/game-admin/login", element: <AdminLoginPage /> },
 
             // Protected Admin Routes
             {
-                path: "/admin/manage-games",
+                path: "/game-admin/manage-games",
                 element: (
                     <ProtectedRoute>
                         <ManageGamesPage />
@@ -42,7 +42,7 @@ const router = createBrowserRouter([
                 ),
             },
             {
-                path: "/admin/create-game",
+                path: "/game-admin/create-game",
                 element: (
                     <ProtectedRoute>
                         <CreateGamePage />
@@ -58,7 +58,7 @@ const router = createBrowserRouter([
                 ),
             },
             {
-                path: "/admin/register-game",
+                path: "/game-admin/register-game",
                 element: (
                     <ProtectedRoute>
                         <RegisterGamePage />
@@ -66,7 +66,7 @@ const router = createBrowserRouter([
                 ),
             },
             {
-                path: "/admin/create-activity",
+                path: "/game-admin/create-activity",
                 element: (
                     <ProtectedRoute>
                         <CreateActivityPage />
