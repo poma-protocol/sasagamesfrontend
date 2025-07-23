@@ -19,6 +19,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import App from './App';
 import NotFound from "@/pages/NotFound";
 import featuredDealsLoader from './loaders/featuredDeals';
+import { AdminSignupPage } from './pages/AdminSignupPage';
 const router = createBrowserRouter([
     {
          path: "/",
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
             { path: "/how-it-works", element: <HowItWorksPage /> },
             { path: "/about", element: <AboutPage /> },
             { path: "/game-admin/login", element: <AdminLoginPage /> },
+            { path: "/game-admin/register", element: <AdminSignupPage /> },
 
             // Protected Admin Routes
             {

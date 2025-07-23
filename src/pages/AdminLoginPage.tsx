@@ -30,13 +30,15 @@ export function AdminLoginPage() {
         e.preventDefault();
         setIsLoading(true);
 
-        const res = await axios.post(`${VITE_BACKEND}/login`, {
+        const res = await axios.post(`${VITE_BACKEND}/auth/login`, {
             email,
             password
         });
 
         if (res.status === 201) {
             localStorage.setItem("isAdminLoggedIn", "true");
+            const token = res.data.token;
+            localStorage.setItem("accessToken", token);
             toast({
                 title: "Login Successful",
                 description: "Welcome back, admin!",
@@ -111,7 +113,7 @@ export function AdminLoginPage() {
                     <div className="mt-4 text-center">
                         <p className="text-sm text-muted-foreground">
                             Don't have an account?{" "}
-                            <Link to="/admin/register" className="text-primary hover:underline">
+                            <Link to="/game-admin/register" className="text-primary hover:underline">
                                 Register here
                             </Link>
                         </p>
