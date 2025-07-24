@@ -14,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { toast } from "sonner";
 import axios from "axios";
 import { gameSchema, GameFormData } from "@/types";
+import InfoHover from "@/components/InfoHover";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 export function RegisterGamePage() {
     const form = useForm<GameFormData>({
@@ -219,7 +220,10 @@ export function RegisterGamePage() {
                                     {/* Challenges */}
                                     <div className="space-y-6">
                                         <div className="flex justify-between items-center">
-                                            <h2 className="text-xl font-semibold">Challenges</h2>
+                                            <h2 className="text-xl font-semibold flex flex-row gap-2">
+                                                <span>Challenges</span>
+                                                <InfoHover info="A challenge describes an action that you want to track in the game. This action creates a transaction on chain" />
+                                            </h2>
                                             <Button
                                                 type="button"
                                                 onClick={() => append({
@@ -267,37 +271,12 @@ export function RegisterGamePage() {
                                                             name={`challenges.${index}.name`}
                                                             render={({ field }) => (
                                                                 <FormItem>
-                                                                    <FormLabel>Challenge Name</FormLabel>
+                                                                    <FormLabel className="flex flex-row gap-2 items-center">
+                                                                        <span>Challenge Name</span>
+                                                                        <InfoHover info="Name of the action you want to track. It can be anything" />
+                                                                    </FormLabel>
                                                                     <FormControl>
                                                                         <Input placeholder="e.g., Survive 100 Waves" {...field} />
-                                                                    </FormControl>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-
-                                                        <FormField
-                                                            control={form.control}
-                                                            name={`challenges.${index}.player_address_variable`}
-                                                            render={({ field }) => (
-                                                                <FormItem>
-                                                                    <FormLabel>Player Address Variable</FormLabel>
-                                                                    <FormControl>
-                                                                        <Input placeholder="e.g., playerAddress" {...field} />
-                                                                    </FormControl>
-                                                                    <FormMessage />
-                                                                </FormItem>
-                                                            )}
-                                                        />
-
-                                                        <FormField
-                                                            control={form.control}
-                                                            name={`challenges.${index}.function_name`}
-                                                            render={({ field }) => (
-                                                                <FormItem>
-                                                                    <FormLabel>Function Name</FormLabel>
-                                                                    <FormControl>
-                                                                        <Input placeholder="e.g., completeWave" {...field} />
                                                                     </FormControl>
                                                                     <FormMessage />
                                                                 </FormItem>
@@ -309,9 +288,68 @@ export function RegisterGamePage() {
                                                             name={`challenges.${index}.contract_address`}
                                                             render={({ field }) => (
                                                                 <FormItem>
-                                                                    <FormLabel>Contract Address</FormLabel>
+                                                                    <FormLabel className="flex flex-row gap-2 items-center">
+                                                                        <span>Contract Address</span>
+                                                                        <InfoHover info="Address of the smart contract that's called when player performs action" />
+                                                                    </FormLabel>
                                                                     <FormControl>
                                                                         <Input placeholder="0x..." {...field} />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    </div>
+
+                                                    <FormField
+                                                        control={form.control}
+                                                        name={`challenges.${index}.abi`}
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel className="flex flex-row gap-2 items-center">
+                                                                    <span>Contract ABI</span>
+                                                                    <InfoHover info="ABI of the smart contract called" />
+                                                                </FormLabel>
+                                                                <FormControl>
+                                                                    <Textarea
+                                                                        placeholder='[{"inputs":[{"name":"x","type":"uint256"}],"name":"increment","outputs":[{"name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"}]'
+                                                                        {...field}
+                                                                    />
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <FormField
+                                                            control={form.control}
+                                                            name={`challenges.${index}.function_name`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormLabel className="flex flex-row gap-2 items-center">
+                                                                        <span>Function Name</span>
+                                                                        <InfoHover info="The name of the smart contract function that's executed when the player performs the action" />
+                                                                    </FormLabel>
+                                                                    <FormControl>
+                                                                        <Input placeholder="e.g., completeWave" {...field} />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+
+                                                        <FormField
+                                                            control={form.control}
+                                                            name={`challenges.${index}.player_address_variable`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormLabel className="flex flex-row gap-2 items-center">
+                                                                        <span>Player Address Variable</span>
+                                                                        <InfoHover info="The name of the parameter in the smart contract function executed by the action that stores the player's address" />
+                                                                    </FormLabel>
+                                                                    <FormControl>
+                                                                        <Input placeholder="e.g., playerAddress" {...field} />
                                                                     </FormControl>
                                                                     <FormMessage />
                                                                 </FormItem>
@@ -330,19 +368,25 @@ export function RegisterGamePage() {
                                                                         onCheckedChange={field.onChange}
                                                                     />
                                                                 </FormControl>
-                                                                <FormLabel>Use Forwarder</FormLabel>
+                                                                <FormLabel className="flex flex-row gap-2 items-center">
+                                                                    <span>Use Forwarder</span>
+                                                                    <InfoHover info="There are games that use a proxy smart contract that forwards transactions to other contracts responsible for handling in game actions. If you use a proxy contract please check this and enter its details below" />
+                                                                </FormLabel>
                                                             </FormItem>
                                                         )}
                                                     />
 
                                                     {form.watch(`challenges.${index}.useForwarder`) && (
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div className="grid grid-cols-1 gap-4">
                                                             <FormField
                                                                 control={form.control}
                                                                 name={`challenges.${index}.forwarderAddress`}
                                                                 render={({ field }) => (
                                                                     <FormItem>
-                                                                        <FormLabel>Forwarder Address</FormLabel>
+                                                                        <FormLabel className="flex flex-row gap-2 items-center">
+                                                                            <span>Forwarder Address</span>
+                                                                            <InfoHover info="Address of the proxy smart contract" />
+                                                                        </FormLabel>
                                                                         <FormControl>
                                                                             <Input placeholder="0x..." {...field} />
                                                                         </FormControl>
@@ -356,7 +400,10 @@ export function RegisterGamePage() {
                                                                 name={`challenges.${index}.forwarderABI`}
                                                                 render={({ field }) => (
                                                                     <FormItem>
-                                                                        <FormLabel>Forwarder ABI</FormLabel>
+                                                                        <FormLabel className="flex flex-row gap-2 items-center">
+                                                                            <span>Forwarder ABI</span>
+                                                                            <InfoHover info="ABI of the proxy smartcontract" />
+                                                                        </FormLabel>
                                                                         <FormControl>
                                                                             <Textarea
                                                                                 placeholder='Forwarder ABI JSON'
@@ -376,7 +423,10 @@ export function RegisterGamePage() {
                                                             name={`challenges.${index}.methodDataAttributeName`}
                                                             render={({ field }) => (
                                                                 <FormItem>
-                                                                    <FormLabel>Method Data Attribute Name</FormLabel>
+                                                                    <FormLabel className="flex flex-row gap-2 items-center">
+                                                                        <span>Item Variable</span>
+                                                                        <InfoHover info="If the player interacts with something else in the action and you want to check for that other item you can give the name of the parameter that stores that other item in the smart contract function" />
+                                                                    </FormLabel>
                                                                     <FormControl>
                                                                         <Input placeholder="e.g., methodData" {...field} />
                                                                     </FormControl>
@@ -390,7 +440,10 @@ export function RegisterGamePage() {
                                                             name={`challenges.${index}.wantedData`}
                                                             render={({ field }) => (
                                                                 <FormItem>
-                                                                    <FormLabel>Wanted Data</FormLabel>
+                                                                    <FormLabel className="flex flex-row gap-2 items-center">
+                                                                        <span>Wanted Data</span>
+                                                                        <InfoHover info="The value of the item that you're checking for" />
+                                                                    </FormLabel>
                                                                     <FormControl>
                                                                         <Input placeholder="e.g., waveNumber" {...field} />
                                                                     </FormControl>
@@ -411,24 +464,10 @@ export function RegisterGamePage() {
                                                                         onCheckedChange={field.onChange}
                                                                     />
                                                                 </FormControl>
-                                                                <FormLabel>Count Items</FormLabel>
-                                                            </FormItem>
-                                                        )}
-                                                    />
-
-                                                    <FormField
-                                                        control={form.control}
-                                                        name={`challenges.${index}.abi`}
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormLabel>Challenge ABI</FormLabel>
-                                                                <FormControl>
-                                                                    <Textarea
-                                                                        placeholder='[{"inputs":[{"name":"x","type":"uint256"}],"name":"increment","outputs":[{"name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"}]'
-                                                                        {...field}
-                                                                    />
-                                                                </FormControl>
-                                                                <FormMessage />
+                                                                <FormLabel className="flex flex-row gap-2 items-center">
+                                                                    <span>Count Items</span>
+                                                                    <InfoHover info="If the player can interact with multiple items in the action, check this to count them and have that count contribute to the goal" />
+                                                                </FormLabel>
                                                             </FormItem>
                                                         )}
                                                     />
