@@ -5,18 +5,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Lock, LogIn, User } from "lucide-react";
+import { Lock, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 const VITE_BACKEND = import.meta.env.VITE_BACKEND_URL;
 
-export function AdminLoginPage() {
+export function AdminSignupPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");;
     const [isLoading, setIsLoading] = useState(false);
-    const { isAdminLoggedIn, login } = useAdmin();
+    const { isAdminLoggedIn } = useAdmin();
     const navigate = useNavigate();
     const { toast } = useToast();
 
@@ -30,31 +30,23 @@ export function AdminLoginPage() {
         e.preventDefault();
         setIsLoading(true);
 
-        const res = await axios.post(`${VITE_BACKEND}/auth/login`, {
+        const res = await axios.post(`${VITE_BACKEND}/auth/register`, {
             email,
             password
         });
 
-        if (res.status === 200) {
-            const token = res.data.token
-            if (!token) {
-                toast({
-                    title: "Login Failed",
-                    description: "No token received",
-                    variant: "destructive",
-                });
-                setIsLoading(false);
-                return;
-            }
-            login(token);
+        if (res.status === 201) {
+            localStorage.setItem("isAdminLoggedIn", "true");
+            const token = res.data.token;
+            localStorage.setItem("accessToken", token);
             toast({
-                title: "Login Successful",
-                description: "Welcome back, admin!",
+                title: "Signup Successful",
+                description: "Welcome, admin!",
             });
             navigate("/game-admin/manage-games");
         } else {
             toast({
-                title: "Login Failed",
+                title: "Signup Failed",
                 description: "Invalid email or password",
                 variant: "destructive",
             });
@@ -70,7 +62,7 @@ export function AdminLoginPage() {
                     <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-gradient-to-r from-primary to-primary-end flex items-center justify-center">
                         <Lock className="h-8 w-8 text-white" />
                     </div>
-                    <CardTitle className="text-2xl font-bold">Game admin Login</CardTitle>
+                    <CardTitle className="text-2xl font-bold">Game admin signup page</CardTitle>
                     <CardDescription>
                         Access the admin dashboard to manage games and battles
                     </CardDescription>
@@ -115,14 +107,14 @@ export function AdminLoginPage() {
                             className="w-full bg-gradient-to-r from-primary to-primary-end hover:opacity-90 transition-opacity"
                             disabled={isLoading}
                         >
-                            {isLoading ? "Signing in..." : "Sign In"}
+                            {isLoading ? "Signing up..." : "Sign Up"}
                         </Button>
                     </form>
                     <div className="mt-4 text-center">
                         <p className="text-sm text-muted-foreground">
-                            Don't have an account?{" "}
-                            <Link to="/game-admin/register" className="text-primary hover:underline">
-                                Register here
+                            Already have an account?{" "}
+                            <Link to="/admin/login" className="text-primary hover:underline">
+                                Login here
                             </Link>
                         </p>
 
