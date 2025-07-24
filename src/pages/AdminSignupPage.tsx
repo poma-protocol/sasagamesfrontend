@@ -113,7 +113,7 @@ export function AdminSignupPage() {
                     <div className="mt-4 text-center">
                         <p className="text-sm text-muted-foreground">
                             Already have an account?{" "}
-                            <Link to="/admin/login" className="text-primary hover:underline">
+                            <Link to="/game-admin/login" className="text-primary hover:underline">
                                 Login here
                             </Link>
                         </p>

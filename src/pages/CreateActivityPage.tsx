@@ -47,6 +47,7 @@ export function CreateActivityPage() {
     const [challenges, setChallenges] = useState<Challenge[]>([]);
     const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
     const [issue, setIssue] = useState(false);
+    const token = localStorage.getItem("accessToken");
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const form = useForm<ActivityFormData>({
@@ -149,6 +150,10 @@ export function CreateActivityPage() {
     const onSubmit = async (data: ActivityFormData) => {
         setIsLoading(true);
         try {
+            if(!token){
+                toast.error("You must be logged in to create an activity");
+                return;
+            }
             //Save image first
             if (data.image) {
                 const imageUrl = await saveImage(data.image);
@@ -161,6 +166,10 @@ export function CreateActivityPage() {
                     ...data,
                     instructions: instructions.filter(instruction => instruction.trim() !== ''),
                     image: imageUrl,
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
 
                 console.log("Activity created with ID:", response.data.id);
