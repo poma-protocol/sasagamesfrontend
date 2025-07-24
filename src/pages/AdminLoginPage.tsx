@@ -5,24 +5,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Lock, User } from "lucide-react";
+import { Lock, LogIn, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { Link } from "react-router-dom";
-
+import { useAdmin } from "@/contexts/AdminContext";
 const VITE_BACKEND = import.meta.env.VITE_BACKEND_URL;
 
 export function AdminLoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");;
     const [isLoading, setIsLoading] = useState(false);
+    const { isAdminLoggedIn, login } = useAdmin();
     const navigate = useNavigate();
     const { toast } = useToast();
 
     useEffect(() => {
-        const adminStatus = localStorage.getItem("isAdminLoggedIn");
-        if (adminStatus === "true") {
-            navigate("/admin/register-game");
+        if (isAdminLoggedIn) {
+            navigate("/game-admin/manage-games");
         }
     }, []);
 
@@ -35,15 +35,23 @@ export function AdminLoginPage() {
             password
         });
 
-        if (res.status === 201) {
-            localStorage.setItem("isAdminLoggedIn", "true");
-            const token = res.data.token;
-            localStorage.setItem("accessToken", token);
+        if (res.status === 200) {
+            const token = res.data.token
+            if (!token) {
+                toast({
+                    title: "Login Failed",
+                    description: "No token received",
+                    variant: "destructive",
+                });
+                setIsLoading(false);
+                return;
+            }
+            login(token);
             toast({
                 title: "Login Successful",
                 description: "Welcome back, admin!",
             });
-            navigate("/game-admin/register-game");
+            navigate("/game-admin/manage-games");
         } else {
             toast({
                 title: "Login Failed",
@@ -118,7 +126,7 @@ export function AdminLoginPage() {
                             </Link>
                         </p>
 
-                </div>
+                    </div>
 
                 </CardContent>
             </Card>

@@ -128,10 +128,10 @@ export function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/battles">
+            <Link to="/game-admin/login">
               <Button size="lg" className="btn-gradient text-lg px-8 py-4 font-rajdhani font-bold">
                 <PlayCircle className="mr-2 h-6 w-6" />
-                Play a Battle
+                Get started as a game Admin
               </Button>
             </Link>
             <Link to="/battles">

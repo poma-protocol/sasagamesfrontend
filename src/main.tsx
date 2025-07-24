@@ -77,11 +77,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/my-battles",
-                element: (
-                    <ProtectedRoute>
-                        <MyBattlesPage />
-                    </ProtectedRoute>
-                ),
+                element: <MyBattlesPage />
             },
             {
                 path: "/create-battle",

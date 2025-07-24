@@ -9,20 +9,20 @@ import { Lock, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { Link } from "react-router-dom";
-
+import { useAdmin } from "@/contexts/AdminContext";
 const VITE_BACKEND = import.meta.env.VITE_BACKEND_URL;
 
 export function AdminSignupPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");;
     const [isLoading, setIsLoading] = useState(false);
+    const { isAdminLoggedIn } = useAdmin();
     const navigate = useNavigate();
     const { toast } = useToast();
 
     useEffect(() => {
-        const adminStatus = localStorage.getItem("isAdminLoggedIn");
-        if (adminStatus === "true") {
-            navigate("/admin/register-game");
+        if (isAdminLoggedIn) {
+            navigate("/game-admin/manage-games");
         }
     }, []);
 
@@ -43,7 +43,7 @@ export function AdminSignupPage() {
                 title: "Signup Successful",
                 description: "Welcome, admin!",
             });
-            navigate("/game-admin/register-game");
+            navigate("/game-admin/manage-games");
         } else {
             toast({
                 title: "Signup Failed",
