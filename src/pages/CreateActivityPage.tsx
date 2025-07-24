@@ -24,6 +24,8 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import InfoHover from "@/components/InfoHover";
+import ActivateDealButton from "@/components/ActivateBattle";
+import BattleSummary from "@/components/BattleSummary";
 type ActivityFormData = z.infer<typeof activitySchema>;
 
 interface Game {
@@ -48,6 +50,16 @@ export function CreateActivityPage() {
     const [challenges, setChallenges] = useState<Challenge[]>([]);
     const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
     const [issue, setIssue] = useState(false);
+
+    const [activityID, setActivityID] = useState<number>(1);
+    const [rewardPerUser, setRewardPerUser] = useState<number>(0);
+    const [maxUsers, setMaxUsers] = useState<number>(0);
+
+    const totalFunding = rewardPerUser * maxUsers;
+    const platformCommission = totalFunding / 10;
+    const totalRequired = platformCommission + totalFunding;
+
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const form = useForm<ActivityFormData>({
@@ -185,20 +197,10 @@ export function CreateActivityPage() {
         }
     };
 
-    const getDifficultyColor = (difficulty: string) => {
-        switch (difficulty) {
-            case 'easy': return 'text-green-400';
-            case 'medium': return 'text-yellow-400';
-            case 'hard': return 'text-orange-400';
-            case 'expert': return 'text-red-400';
-            default: return 'text-gray-400';
-        }
-    };
-
     return (
         <div className="min-h-screen bg-background text-foreground py-20">
-            <div className="container mx-auto px-4 py-8">
-                <div className="max-w-4xl mx-auto">
+            <div className="container mx-auto px-4 py-8 grid md:grid-cols-3">
+                <div className="max-w-4xl mx-auto col-span-2">
                     {/* Header */}
                     <div className="flex items-center gap-4 mb-8">
                         <div className="p-3 rounded-lg bg-gradient-to-r from-primary/20 to-accent/20">
@@ -255,7 +257,7 @@ export function CreateActivityPage() {
 
                     {/* Game Selection */}
                     <Card className="border-primary/20 bg-card mb-6">
-                        <CardHeader>
+                        {activityID === 0 ? <CardHeader>
                             <CardTitle className="text-2xl font-orbitron flex items-center gap-2">
                                 <Gamepad2 className="h-6 w-6" />
                                 Select Game
@@ -263,10 +265,19 @@ export function CreateActivityPage() {
                             <CardDescription>
                                 Choose the game for which you want to create an battle
                             </CardDescription>
-                        </CardHeader>
+                        </CardHeader> : <CardHeader>
+                            <CardTitle className="text-2xl font-orbitron flex items-center gap-2">
+                                <Gamepad2 className="h-6 w-6" />
+                                Lock Rewards
+                            </CardTitle>
+                            <CardDescription>
+                                Lock the rewards for the battle in our smart contract and pay the 10% commission
+                            </CardDescription>
+                        </CardHeader>}
+
 
                         <CardContent>
-                            <Select onValueChange={handleGameSelection} value={selectedGameId?.toString() || ""}>
+                            {activityID === 0 ? <Select onValueChange={handleGameSelection} value={selectedGameId?.toString() || ""}>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder={isLoadingGames ? "Loading games..." : "Select a game"} />
                                 </SelectTrigger>
@@ -280,12 +291,18 @@ export function CreateActivityPage() {
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
-                            </Select>
+                            </Select> : <ActivateDealButton 
+                                            activityID={activityID} 
+                                            commissionPaid={false} 
+                                            activated={false} 
+                                            rewardPerUser={rewardPerUser} 
+                                            maxUsers={maxUsers}
+                            />}
                         </CardContent>
                     </Card>
 
                     {/* Form - Only show if game is selected */}
-                    {selectedGameId && (
+                    {activityID === 0 && selectedGameId && (
                         <Card className="border-primary/20 bg-card">
                             <CardHeader>
                                 <CardTitle className="text-2xl font-orbitron">Battle Details</CardTitle>
@@ -621,6 +638,14 @@ export function CreateActivityPage() {
                         </Card>
                     )}
                 </div>
+
+                <BattleSummary 
+                    rewardPerUser={rewardPerUser} 
+                    totalFunding={totalFunding} 
+                    maxUsers={maxUsers} 
+                    platformCommission={platformCommission} 
+                    totalRequired={totalRequired} 
+                />
             </div>
         </div>
     );
