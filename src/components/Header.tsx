@@ -113,12 +113,12 @@ export function Header() {
                                             </DropdownMenuItem>
                                         ))}
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem asChild>
+                                        {/* <DropdownMenuItem asChild>
                                             <Link to="/my-battles" className="flex items-center">
                                                 <Zap className="h-4 w-4 mr-2" />
                                                 My Battles
                                             </Link>
-                                        </DropdownMenuItem>
+                                        </DropdownMenuItem> */}
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem
                                             onClick={handleAdminLogout}
