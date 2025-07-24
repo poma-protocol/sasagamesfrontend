@@ -27,7 +27,8 @@ export const featuredDealsSchema = z.object({
     maxPlayers: z.number(),
     startDate: z.string(),
     endDate: z.string(),
-    status: z.enum(["upcoming", "active", "completed"])
+    status: z.enum(["upcoming", "active", "completed"]),
+    players: z.array(z.string())
 });
 
 export const activitySchema = z.object({
@@ -35,8 +36,8 @@ export const activitySchema = z.object({
     goal: z.number().min(1, "Goal is required"),
     reward: z.number().min(0, "Reward must be non-negative"),
     name: z.string().min(1, "Activity name is required"),
-    startDate: z.date({ required_error: "Start date is required" }),
-    endDate: z.date({ required_error: "End date is required" }),
+    startDate: z.date({ message: "Start date is required" }),
+    endDate: z.date({ message: "End date is required" }),
     image: z.instanceof(File).optional(),
     about: z.string().optional(),
     instructions: z.array(z.string()).optional(),

@@ -138,9 +138,9 @@ export default function BattleCardActionButton(props: BattleCardActionButtonProp
     let statusText = "";
 
     if (joined === true) {
-        statusText = "Joining battle"
+        statusText = "Already Joined Battle"
     } else if (loading === true) {
-        statusText = "Already joined battle"
+        statusText = "Joining Battle"
     } else {
         if (props.status === "completed") {
             statusText = "View Results";

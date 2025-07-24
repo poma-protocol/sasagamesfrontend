@@ -4,10 +4,12 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FeaturedDeal } from "@/types";
 import { Calendar, Users, Trophy, Clock } from "lucide-react";
 import BattleCardActionButton from "./BattleCardActionButton";
+import { useAccount } from "wagmi";
 
 const ACTIVITY_IMAGE_URL = import.meta.env.VITE_ACTIVITY_IMAGE_URL;
 
 export function BattleCard(props: FeaturedDeal) {
+  const {address} = useAccount();
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -20,6 +22,11 @@ export function BattleCard(props: FeaturedDeal) {
         return "bg-gradient-to-r from-primary to-primary-end";
     }
   };
+
+  let joined = false;
+  if (address) {
+    joined = props.players.some((p) => p.toLowerCase() === address.toLowerCase());
+  }
 
   return (
     <Card className="game-card group cursor-pointer">
@@ -87,7 +94,7 @@ export function BattleCard(props: FeaturedDeal) {
         </div>
 
         {/* Action Button */}
-        <BattleCardActionButton playerCount={props.playerCount} maxPlayers={props.maxPlayers} id={props.id} status={props.status} joined={false}/>
+        <BattleCardActionButton playerCount={props.playerCount} maxPlayers={props.maxPlayers} id={props.id} status={props.status} joined={joined}/>
       </CardContent>
     </Card>
   );
