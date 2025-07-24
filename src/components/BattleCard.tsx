@@ -87,7 +87,7 @@ export function BattleCard(props: FeaturedDeal) {
         </div>
 
         {/* Action Button */}
-        <BattleCardActionButton playerCount={props.playerCount} maxPlayers={props.maxPlayers} id={props.id} status={props.status} />
+        <BattleCardActionButton playerCount={props.playerCount} maxPlayers={props.maxPlayers} id={props.id} status={props.status} joined={false}/>
       </CardContent>
     </Card>
   );

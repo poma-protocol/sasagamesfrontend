@@ -16,7 +16,8 @@ interface BattleCardActionButtonProps {
     id: number,
     status: string,
     playerCount: number,
-    maxPlayers: number
+    maxPlayers: number,
+    joined: boolean,
 }
 
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -29,6 +30,7 @@ export default function BattleCardActionButton(props: BattleCardActionButtonProp
     const navigate = useNavigate();
     const [loading, setLoading] = useState<boolean>(false);
     const [enterOperatorAddress, setEnterOperatorAddress] = useState<boolean>(false);
+    const [joined, setJoined] = useState<boolean>(props.joined)
 
     const form = useForm<z.infer<typeof storeOperatorAddress>>({
         resolver: zodResolver(storeOperatorAddress),
@@ -96,6 +98,7 @@ export default function BattleCardActionButton(props: BattleCardActionButtonProp
                 <DialogTrigger asChild>
                     <Button
                         onClick={handleButtonClick}
+                        disabled={joined}
                         className="w-full font-rajdhani font-semibold btn-gradient"
                     >
                         Enter Operator Address
@@ -132,20 +135,35 @@ export default function BattleCardActionButton(props: BattleCardActionButtonProp
         );
     }
 
+    let statusText = "";
+
+    if (joined === true) {
+        statusText = "Joining battle"
+    } else if (loading === true) {
+        statusText = "Already joined battle"
+    } else {
+        if (props.status === "completed") {
+            statusText = "View Results";
+        } else if (props.status === "active") {
+            if (props.playerCount >= props.maxPlayers) {
+                statusText = "Battle Full";
+            } else {
+                statusText = "Join Battle"
+            }
+        } else {
+            statusText = "View Battle"
+        }
+    }
+
     return (
         <Button
             onClick={handleButtonClick}
+            disabled={joined}
             className={`w-full font-rajdhani font-semibold ${props.status === "active" ? "btn-gradient" : "btn-neon"
                 }`}
             // disabled={props.status === "completed" || props.playerCount >= props.maxPlayers}
         >
-            {loading == false ? props.status === "completed"
-                ? "View Results"
-                : props.status === "active"
-                    ? props.playerCount >= props.maxPlayers
-                        ? "Battle Full"
-                        : "Join Battle"
-                    : "View Battle" : "Joining battle..."}
+            {statusText}
         </Button>
     );
 }
