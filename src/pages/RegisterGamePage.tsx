@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Trash2, Upload, FileText } from "lucide-react";
+import { Plus, Trash2, Upload, FileText, AlertCircle } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
 import axios from "axios";
@@ -94,8 +94,8 @@ export function RegisterGamePage() {
 
     return (
         <div className="min-h-screen bg-background text-foreground">
-            <div className="container mx-auto px-4 py-8">
-                <div className="max-w-4xl mx-auto">
+            <div className="container mx-auto px-4 py-8 grid md:grid-cols-3 gap-2">
+                <div className="max-w-4xl col-span-2">
                     <Card className="border-primary/20 bg-card">
                         <CardHeader>
                             <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-end bg-clip-text text-transparent">
@@ -484,6 +484,22 @@ export function RegisterGamePage() {
                                     </Button>
                                 </form>
                             </Form>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <div className="max-w-4xl mx-auto">
+                    <Card className="bg-slate-800/50 border-slate-700">
+                        <CardHeader>
+                            <CardTitle className="text-white flex items-center gap-2">
+                                <AlertCircle className="w-5 h-5" />
+                                Support
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-slate-300 text-sm space-y-2">
+                                <p>• If you have any issue registering a game you can reach out to us at info@pomaprotocol.com</p>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
