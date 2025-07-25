@@ -50,6 +50,7 @@ export function CreateActivityPage() {
     const [challenges, setChallenges] = useState<Challenge[]>([]);
     const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
     const [issue, setIssue] = useState(false);
+    const token = localStorage.getItem("accessToken");
 
     const [activityID, setActivityID] = useState<number>(1);
     const [rewardPerUser, setRewardPerUser] = useState<number>(0);
@@ -58,7 +59,6 @@ export function CreateActivityPage() {
     const totalFunding = rewardPerUser * maxUsers;
     const platformCommission = totalFunding / 10;
     const totalRequired = platformCommission + totalFunding;
-
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -162,6 +162,10 @@ export function CreateActivityPage() {
     const onSubmit = async (data: ActivityFormData) => {
         setIsLoading(true);
         try {
+            if(!token){
+                toast.error("You must be logged in to create an activity");
+                return;
+            }
             //Save image first
             if (data.image) {
                 const imageUrl = await saveImage(data.image);
@@ -174,6 +178,10 @@ export function CreateActivityPage() {
                     ...data,
                     instructions: instructions.filter(instruction => instruction.trim() !== ''),
                     image: imageUrl,
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
 
                 console.log("Battle created with ID:", response.data.id);

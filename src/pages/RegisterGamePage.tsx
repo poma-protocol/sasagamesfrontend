@@ -38,6 +38,7 @@ export function RegisterGamePage() {
             }],
         },
     });
+    const token = localStorage.getItem("accessToken");
 
     const { fields, append, remove } = useFieldArray({
         control: form.control,
@@ -50,6 +51,7 @@ export function RegisterGamePage() {
             const response = await axios.post(`${BACKEND_URL}/game/upload`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`,
                 },
             });
             if (response.status !== 201) {
@@ -65,6 +67,10 @@ export function RegisterGamePage() {
     }
     const onSubmit = async (data: GameFormData) => {
         try {
+             if (!token) {
+                toast.error("You must be logged in to upload an image.");
+                return null;
+            }
             if (data.image instanceof File) {
                 const imageUrl = await saveImage(data.image);
                 if (!imageUrl) {
@@ -74,6 +80,11 @@ export function RegisterGamePage() {
                 const response = await axios.post(`${BACKEND_URL}/game/register`, {
                     ...data,
                     image: imageUrl,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
                 );
                 if (response.status === 201) {

@@ -24,7 +24,7 @@ const router = createBrowserRouter([
     {
          path: "/",
         element: <App />,
-        errorElement: <NotFound />,
+        // errorElement: <NotFound />,
         children: [
             { path: "/", loader: featuredDealsLoader, element: <LandingPage /> },
             { path: "/battles", element: <BattlesPage /> },
@@ -87,6 +87,14 @@ const router = createBrowserRouter([
                     </ProtectedRoute>
                 ),
             },
+            {
+                path: "/game-admin/manage-activities",
+                element: (
+                    <ProtectedRoute>
+                        <ManageActivitiesPage />
+                    </ProtectedRoute>
+                ),
+            }
 
             // { path: "*", element: <NotFound /> },
         ]
