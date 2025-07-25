@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Menu, X, Zap, Settings, Plus, GamepadIcon, LogOut } from "lucide-react";
+import { Menu, X, Zap, Settings, Plus, GamepadIcon, LogOut, InfoIcon } from "lucide-react";
 import { useAdmin } from "@/contexts/AdminContext";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import path from "path";
@@ -24,6 +24,7 @@ export function Header() {
     ];
 
     const adminNavItems = [
+        {name: "How It Works", path: "/game-admin/how-it-works"},
         { name: "Manage Games", path: "/game-admin/manage-games" },
         { name: "Register Game", path: "/game-admin/register-game" },
         { name: "Create Activity", path: "/game-admin/create-activity" },
@@ -105,6 +106,7 @@ export function Header() {
                                         {adminNavItems.map((item) => (
                                             <DropdownMenuItem key={item.name} asChild>
                                                 <Link to={item.path} className="flex items-center">
+                                                    {item.name === "How It Works" && <InfoIcon className="h-4 w-4 mr-2" />}
                                                     {item.name === "Manage Games" && <GamepadIcon className="h-4 w-4 mr-2" />}
                                                     {item.name === "Register Game" && <Plus className="h-4 w-4 mr-2" />}
                                                     {item.name === "Create Activity" && <Plus className="h-4 w-4 mr-2" />}

@@ -20,6 +20,7 @@ import App from './App';
 import NotFound from "@/pages/NotFound";
 import featuredDealsLoader from './loaders/featuredDeals';
 import { AdminSignupPage } from './pages/AdminSignupPage';
+import { HowGameWorks } from './pages/HowGameWorks';
 const router = createBrowserRouter([
     {
          path: "/",
@@ -94,6 +95,14 @@ const router = createBrowserRouter([
                         <ManageActivitiesPage />
                     </ProtectedRoute>
                 ),
+            },
+            {
+                path: "/game-admin/how-it-works",
+                element: (
+                    <ProtectedRoute>
+                        <HowGameWorks />
+                    </ProtectedRoute>
+                )
             }
 
             // { path: "*", element: <NotFound /> },
