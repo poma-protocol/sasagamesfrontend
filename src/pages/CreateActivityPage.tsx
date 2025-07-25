@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Target, Trophy, Users, Upload, Gamepad2 } from "lucide-react";
-import {Calendar} from "@/components/ui/calendar";
+import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
 import axios from "axios";
 import { API_CONFIG } from "@/config";
@@ -23,6 +23,9 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import InfoHover from "@/components/InfoHover";
+import ActivateDealButton from "@/components/ActivateBattle";
+import BattleSummary from "@/components/BattleSummary";
 type ActivityFormData = z.infer<typeof activitySchema>;
 
 interface Game {
@@ -48,6 +51,15 @@ export function CreateActivityPage() {
     const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
     const [issue, setIssue] = useState(false);
     const token = localStorage.getItem("accessToken");
+
+    const [activityID, setActivityID] = useState<number>(1);
+    const [rewardPerUser, setRewardPerUser] = useState<number>(0);
+    const [maxUsers, setMaxUsers] = useState<number>(0);
+
+    const totalFunding = rewardPerUser * maxUsers;
+    const platformCommission = totalFunding / 10;
+    const totalRequired = platformCommission + totalFunding;
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const form = useForm<ActivityFormData>({
@@ -57,8 +69,8 @@ export function CreateActivityPage() {
             goal: 1,
             reward: 0,
             name: "",
-            startDate: "",
-            endDate: "",
+            startDate: new Date(),
+            endDate: new Date(),
             image: null,
             about: "",
             instructions: [],
@@ -158,7 +170,7 @@ export function CreateActivityPage() {
             if (data.image) {
                 const imageUrl = await saveImage(data.image);
                 if (!imageUrl) {
-                    toast.error("Failed to upload activity image");
+                    toast.error("Failed to upload battle image");
                     return;
                 }
 
@@ -172,8 +184,8 @@ export function CreateActivityPage() {
                     },
                 });
 
-                console.log("Activity created with ID:", response.data.id);
-                toast.success("Activity created successfully!");
+                console.log("Battle created with ID:", response.data.id);
+                toast.success("Battle created successfully!");
                 form.reset();
                 setInstructions([]);
                 setImageFile(null);
@@ -181,32 +193,22 @@ export function CreateActivityPage() {
                 setChallenges([]);
             }
             else {
-                toast.error("Please upload an activity image");
+                toast.error("Please upload an battle image");
                 return;
             }
 
         } catch (error) {
-            console.error("Error creating activity:", error);
-            toast.error("Failed to create activity. Please try again.");
+            console.error("Error creating battle:", error);
+            toast.error("Failed to create battle. Please try again.");
         } finally {
             setIsLoading(false);
         }
     };
 
-    const getDifficultyColor = (difficulty: string) => {
-        switch (difficulty) {
-            case 'easy': return 'text-green-400';
-            case 'medium': return 'text-yellow-400';
-            case 'hard': return 'text-orange-400';
-            case 'expert': return 'text-red-400';
-            default: return 'text-gray-400';
-        }
-    };
-
     return (
         <div className="min-h-screen bg-background text-foreground py-20">
-            <div className="container mx-auto px-4 py-8">
-                <div className="max-w-4xl mx-auto">
+            <div className="container mx-auto px-4 py-8 grid md:grid-cols-3">
+                <div className="max-w-4xl mx-auto col-span-2">
                     {/* Header */}
                     <div className="flex items-center gap-4 mb-8">
                         <div className="p-3 rounded-lg bg-gradient-to-r from-primary/20 to-accent/20">
@@ -214,10 +216,10 @@ export function CreateActivityPage() {
                         </div>
                         <div>
                             <h1 className="text-4xl font-bold font-orbitron bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                                CREATE ACTIVITY
+                                CREATE BATTLE
                             </h1>
                             <p className="text-muted-foreground mt-2 font-rajdhani">
-                                Create a new activity for players to compete in
+                                Create a new battle for players to compete in
                             </p>
                         </div>
                     </div>
@@ -228,7 +230,7 @@ export function CreateActivityPage() {
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-muted-foreground font-rajdhani">Total Activities</p>
+                                        <p className="text-muted-foreground font-rajdhani">Total Battles</p>
                                         <p className="text-2xl font-bold font-orbitron text-primary">24</p>
                                     </div>
                                     <Target className="h-8 w-8 text-primary/60" />
@@ -263,18 +265,27 @@ export function CreateActivityPage() {
 
                     {/* Game Selection */}
                     <Card className="border-primary/20 bg-card mb-6">
-                        <CardHeader>
+                        {activityID === 0 ? <CardHeader>
                             <CardTitle className="text-2xl font-orbitron flex items-center gap-2">
                                 <Gamepad2 className="h-6 w-6" />
                                 Select Game
                             </CardTitle>
                             <CardDescription>
-                                Choose the game for which you want to create an activity
+                                Choose the game for which you want to create an battle
                             </CardDescription>
-                        </CardHeader>
+                        </CardHeader> : <CardHeader>
+                            <CardTitle className="text-2xl font-orbitron flex items-center gap-2">
+                                <Gamepad2 className="h-6 w-6" />
+                                Lock Rewards
+                            </CardTitle>
+                            <CardDescription>
+                                Lock the rewards for the battle in our smart contract and pay the 10% commission
+                            </CardDescription>
+                        </CardHeader>}
+
 
                         <CardContent>
-                            <Select onValueChange={handleGameSelection} value={selectedGameId?.toString() || ""}>
+                            {activityID === 0 ? <Select onValueChange={handleGameSelection} value={selectedGameId?.toString() || ""}>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder={isLoadingGames ? "Loading games..." : "Select a game"} />
                                 </SelectTrigger>
@@ -288,17 +299,23 @@ export function CreateActivityPage() {
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
-                            </Select>
+                            </Select> : <ActivateDealButton 
+                                            activityID={activityID} 
+                                            commissionPaid={false} 
+                                            activated={false} 
+                                            rewardPerUser={rewardPerUser} 
+                                            maxUsers={maxUsers}
+                            />}
                         </CardContent>
                     </Card>
 
                     {/* Form - Only show if game is selected */}
-                    {selectedGameId && (
+                    {activityID === 0 && selectedGameId && (
                         <Card className="border-primary/20 bg-card">
                             <CardHeader>
-                                <CardTitle className="text-2xl font-orbitron">Activity Details</CardTitle>
+                                <CardTitle className="text-2xl font-orbitron">Battle Details</CardTitle>
                                 <CardDescription>
-                                    Fill in the details for your new activity
+                                    Fill in the details for your new battle
                                 </CardDescription>
                             </CardHeader>
 
@@ -315,7 +332,10 @@ export function CreateActivityPage() {
                                                     name="name"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>Activity Name</FormLabel>
+                                                            <FormLabel className="flex flex-row gap-2 items-center">
+                                                                <span>Battle Name</span>
+                                                                <InfoHover info="Name that will be shown in the explore battles page" />
+                                                            </FormLabel>
                                                             <FormControl>
                                                                 <Input placeholder="e.g., Survive 100 Waves" {...field} />
                                                             </FormControl>
@@ -329,7 +349,10 @@ export function CreateActivityPage() {
                                                     name="challenge_id"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>Challenge</FormLabel>
+                                                            <FormLabel className="flex flex-row gap-2 items-center">
+                                                                <span>Challenge</span>
+                                                                <InfoHover info="The action that the player should do to get the reward" />
+                                                            </FormLabel>
                                                             <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
                                                                 <FormControl>
                                                                     <SelectTrigger>
@@ -358,7 +381,7 @@ export function CreateActivityPage() {
                                                         <FormLabel>About (Optional)</FormLabel>
                                                         <FormControl>
                                                             <Textarea
-                                                                placeholder="Describe the activity and what players need to do..."
+                                                                placeholder="Describe the battle and what players need to do..."
                                                                 className="min-h-[100px]"
                                                                 {...field}
                                                             />
@@ -369,9 +392,9 @@ export function CreateActivityPage() {
                                             />
                                         </div>
 
-                                        {/* Activity Settings */}
+                                        {/* Battle Settings */}
                                         <div className="space-y-4">
-                                            <h3 className="text-lg font-semibold font-rajdhani">Activity Settings</h3>
+                                            <h3 className="text-lg font-semibold font-rajdhani">Battle Settings</h3>
 
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <FormField
@@ -379,7 +402,10 @@ export function CreateActivityPage() {
                                                     name="goal"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>Goal</FormLabel>
+                                                            <FormLabel className="flex flex-row gap-2 items-center">
+                                                                <span>Goal</span>
+                                                                <InfoHover info="The number of times the player should perform the action to get the reward" />
+                                                            </FormLabel>
                                                             <FormControl>
                                                                 <Input
                                                                     type="number"
@@ -418,7 +444,10 @@ export function CreateActivityPage() {
                                                     name="maximum_num_players"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>Max Players</FormLabel>
+                                                            <FormLabel className="flex flex-row gap-2 items-center">
+                                                                <span>Max Players</span>
+                                                                <InfoHover info="The maximum number of users that can participate in the battle" />
+                                                            </FormLabel>
                                                             <FormControl>
                                                                 <Input
                                                                     type="number"
@@ -439,7 +468,12 @@ export function CreateActivityPage() {
                                                     control={form.control}
                                                     render={({ field }) => (
                                                         <FormItem className="text-white">
-                                                            <FormLabel className="text-slate-300 block md:inline-block">Start Date *</FormLabel>
+                                                            <FormLabel className="text-slate-300 block md:inline-block">
+                                                                <div className="flex flex-row gap-2 items-center pr-2">
+                                                                    <span>Start Date *</span>
+                                                                    <InfoHover info="The date the users can start joining the battle" />
+                                                                </div>
+                                                            </FormLabel>
                                                             <Popover>
                                                                 <PopoverTrigger asChild>
                                                                     <FormControl>
@@ -486,7 +520,12 @@ export function CreateActivityPage() {
                                                     control={form.control}
                                                     render={({ field }) => (
                                                         <FormItem className="text-white">
-                                                            <FormLabel className="text-slate-300 block md:inline-block">End date *</FormLabel>
+                                                            <FormLabel className="text-slate-300 block md:inline-block">
+                                                                <div className="flex flex-row gap-2 items-center pr-2">
+                                                                    <span>End date *</span>
+                                                                    <InfoHover info="The last date a player can join a battle" />
+                                                                </div>
+                                                            </FormLabel>
                                                             <Popover>
                                                                 <PopoverTrigger asChild>
                                                                     <FormControl>
@@ -531,14 +570,14 @@ export function CreateActivityPage() {
 
                                         {/* Image Upload */}
                                         <div className="space-y-4">
-                                           
+
 
                                             <FormField
                                                 control={form.control}
                                                 name="image"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>Activity Image</FormLabel>
+                                                        <FormLabel>Battle Image</FormLabel>
                                                         <FormControl>
                                                             <div className="flex items-center space-x-4">
                                                                 <Input
@@ -599,7 +638,7 @@ export function CreateActivityPage() {
                                             disabled={isLoading || challenges.length === 0}
                                             className="w-full text-lg py-6 bg-gradient-to-r from-primary to-primary-end hover:opacity-90 transition-opacity"
                                         >
-                                            {isLoading ? "CREATING..." : "CREATE ACTIVITY"}
+                                            {isLoading ? "CREATING..." : "CREATE BATTLE"}
                                         </Button>
                                     </form>
                                 </Form>
@@ -607,6 +646,14 @@ export function CreateActivityPage() {
                         </Card>
                     )}
                 </div>
+
+                <BattleSummary 
+                    rewardPerUser={rewardPerUser} 
+                    totalFunding={totalFunding} 
+                    maxUsers={maxUsers} 
+                    platformCommission={platformCommission} 
+                    totalRequired={totalRequired} 
+                />
             </div>
         </div>
     );
