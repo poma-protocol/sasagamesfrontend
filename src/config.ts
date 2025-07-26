@@ -17,6 +17,8 @@ export const API_CONFIG = {
     ACTIVITY_IMAGE_URL: import.meta.env.VITE_ACTIVITY_IMAGE_URL || 'https://staging.arbitrum.pomaprotocol.com/',
     ENVIRONMENT: environment,
     PROJECT_ID: PROJECT_ID,
+    COMMISSION_WALLET: import.meta.env.VITE_COMMISION_WALLET,
+    CONTRACT_ADDRESS: import.meta.env.VITE_CONTRACT
 };
 
 let chains: _chains;

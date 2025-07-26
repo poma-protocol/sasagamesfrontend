@@ -6,6 +6,7 @@ import ABI from "../../coin.json";
 import { arbitrumSepolia, arbitrum } from 'viem/chains';
 import axios from "axios";
 import { parseEther } from "viem";
+import { API_CONFIG } from "@/config";
 
 interface ActivateButtonProps {
     activityID: number,
@@ -15,9 +16,7 @@ interface ActivateButtonProps {
     maxUsers: number,
 }
 
-const VITE_CONTRACT = import.meta.env.VITE_CONTRACT;
-const VITE_COMMISION_WALLET = import.meta.env.VITE_COMMISION_WALLET;
-const VITE_BACKEND = import.meta.env.VITE_BACKEND;
+
 const CHAIN_ID = import.meta.env.VITE_ENVIRONMENT === "prod" ? 42161 : 421614;
 const CHAIN = import.meta.env.VITE_ENVIRONMENT === "prod" ? arbitrum : arbitrumSepolia;
 const COMMISSION = 0.1;
@@ -28,10 +27,11 @@ export default function ActivateDealButton(props: ActivateButtonProps) {
     const [loading, setLoading] = useState<boolean>(false);
     const [activated, setActivated] = useState<boolean>(props.activated);
     const [commissionPaid, setCommissionPaid] = useState<boolean>(props.commissionPaid);
+    const token = localStorage.getItem("accessToken");
 
     const activateDeal = async () => {
         try {
-            if (!VITE_CONTRACT || !VITE_COMMISION_WALLET) {
+            if (!API_CONFIG.CONTRACT_ADDRESS || !API_CONFIG.COMMISSION_WALLET) {
                 toast.error("Could not get VITE_CONTRACT or VITE_COMMISION_WALLET");
                 return;
             }
@@ -45,12 +45,16 @@ export default function ActivateDealButton(props: ActivateButtonProps) {
 
             if (commissionPaid === false) {
                 // Send commission to commision account
-                const commissionTxHash = await sendTransactionAsync({to: VITE_COMMISION_WALLET, value: parseEther(Math.round((props.rewardPerUser * props.maxUsers * COMMISSION)).toString())})
+                const commissionTxHash = await sendTransactionAsync({to: API_CONFIG.COMMISSION_WALLET, value: parseEther((props.rewardPerUser * props.maxUsers * COMMISSION).toString())})
 
                 // Send amount to our wallet
-                await axios.post(`${VITE_BACKEND}/deals/commission`, {
-                    dealID: props.activityID,
-                    transaction_hash: commissionTxHash
+                await axios.post(`${API_CONFIG.BACKEND_URL}/activity/commission`, {
+                    activityID: props.activityID,
+                    txHash: commissionTxHash
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
 
                 setCommissionPaid(true);
@@ -60,12 +64,16 @@ export default function ActivateDealButton(props: ActivateButtonProps) {
 
             if (activated === false) {
                 // Send amount to contract
-                const rewardSentTxHash = await sendTransactionAsync({to: VITE_COMMISION_WALLET, value: parseEther(Math.round((props.rewardPerUser * props.maxUsers)).toString())})
+                const rewardSentTxHash = await sendTransactionAsync({to: API_CONFIG.CONTRACT_ADDRESS, value: parseEther((props.rewardPerUser * props.maxUsers).toString())})
 
                 // Send amount to our wallet
-                await axios.post(`${VITE_BACKEND}/deals/activate`, {
-                    dealID: props.activityID,
-                    transaction_hash: rewardSentTxHash,
+                await axios.post(`${API_CONFIG.BACKEND_URL}/activity/reward`, {
+                    activityID: props.activityID,
+                    txHash: rewardSentTxHash,
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
 
                 setActivated(true);

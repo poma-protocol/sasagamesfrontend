@@ -29,7 +29,7 @@ export default function BattleSummary(props: DealSummaryProps) {
                         <div className="flex justify-between">
                             <span className="text-slate-400">Reward per User:</span>
                             <span className="text-white font-semibold">
-                                {parseFloat(props.rewardPerUser)}
+                                {parseFloat(props.rewardPerUser)} ETH
                             </span>
                         </div>
                         <div className="flex justify-between">

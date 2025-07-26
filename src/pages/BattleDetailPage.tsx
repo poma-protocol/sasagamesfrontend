@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useAccount } from "wagmi";
 import { useState } from "react";
+import BattleCardActionButton from "@/components/BattleCardActionButton";
 export function BattleDetailPage() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -43,43 +44,7 @@ export function BattleDetailPage() {
         toast.error("Failed to fetch battle details");
     }
 
-    const handleJoinBattle = async () => {
-        console.log("clicked");
-        if (!address) {
-            toast.error("Please connect wallet to join battle");
-            return;
-        }
-        console.log("Battle status:", getBattleStatus(battle));
-        if (getBattleStatus(battle) === 'active') {
-            console.log("I am here");
-            if (address) {
-                try {
-                    setLoading(true);
-                    const res = await axios.post(`${API_CONFIG.BACKEND_URL}/activity/join`, {
-                        activity_id: id,
-                        player_address: address,
-                    });
-                    if (res.status !== 201) {
-                        setLoading(false);
-                        toast.error("Could not join battle");
-                        return;
-                    }
-                    setLoading(false);
-                    toast.success("Joined battle");
-                } catch (err) {
-                    setLoading(false);
-                    console.error("Error joining battle");
-                    toast.error("Could not join battle");
-                }
-            } else {
-                 toast.error("Please connect wallet to join battle");
-            return;
-            }
-        } else {
-            navigate(`/battles/${id}`);
-        }
-    };
-
+    let joined = false;
 
     return (
         <div className="min-h-screen bg-background text-foreground pt-20">
@@ -269,13 +234,7 @@ export function BattleDetailPage() {
                                     </div>
                                 </div>
                                 <Separator />
-                                <Button
-                                    onClick={handleJoinBattle}
-                                    className="w-full text-lg py-6 bg-gradient-to-r from-primary to-primary-end hover:opacity-90 transition-opacity font-rajdhani font-bold"
-                                >
-                                    <Sword className="mr-2 h-5 w-5" />
-                                    {loading ? "Joining..." : getBattleStatus(battle) === 'active' ? "Join Battle" : "Battle Ended"}
-                                </Button>
+                                <BattleCardActionButton id={battle.id} status={battle.status} maxPlayers={battle.maxPlayers} playerCount={battle.playerCount} joined={joined}/>
 
                             </CardContent>
                         </Card>

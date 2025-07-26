@@ -157,7 +157,7 @@ export function ManageGamesPage() {
                                 MANAGE ACTIVITIES
                             </Button>
                         </Link>
-                        <Link to="/admin/register-game">
+                        <Link to="/game-admin/register-game">
                             <Button className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity font-rajdhani font-semibold">
                                 <Plus className="h-4 w-4 mr-2" />
                                 CREATE GAME
@@ -281,7 +281,7 @@ export function ManageGamesPage() {
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                                     <div className="text-center">
                                         <p className="text-2xl font-bold text-primary font-orbitron">{game.challenges}</p>
-                                        <p className="text-sm text-muted-foreground font-rajdhani">Activities</p>
+                                        <p className="text-sm text-muted-foreground font-rajdhani">Challenges</p>
                                     </div>
                                     <div className="text-center">
                                         <p className="text-2xl font-bold text-accent font-orbitron">{game.activeBattles}</p>
