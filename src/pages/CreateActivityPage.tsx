@@ -168,6 +168,10 @@ export function CreateActivityPage() {
                 toast.error("You must be logged in to create an battle");
                 return;
             }
+            if(!address) {
+                toast.error("Please connect your wallet to create an battle");
+                return;
+            }
             //Save image first
             if (data.image) {
                 const imageUrl = await saveImage(data.image);
@@ -180,6 +184,7 @@ export function CreateActivityPage() {
                     ...data,
                     instructions: instructions.filter(instruction => instruction.trim() !== ''),
                     image: imageUrl,
+                    creatorAddress: address,
                 }, {
                     headers: {
                         Authorization: `Bearer ${token}`,
