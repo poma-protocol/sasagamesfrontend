@@ -22,7 +22,7 @@ export function AdminSignupPage() {
 
     useEffect(() => {
         if (isAdminLoggedIn) {
-            navigate("/game-admin/manage-games");
+            navigate("/game-admin/how-it-works");
         }
     }, []);
 
@@ -43,7 +43,7 @@ export function AdminSignupPage() {
                 title: "Signup Successful",
                 description: "Welcome, admin!",
             });
-            navigate("/game-admin/manage-games");
+            navigate("/game-admin/how-it-works");
         } else {
             toast({
                 title: "Signup Failed",

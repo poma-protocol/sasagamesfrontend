@@ -8,10 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Target, Trophy, Users, Upload, Gamepad2 } from "lucide-react";
+import { Target, Trophy, Users, Upload, Gamepad2, OctagonX } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { API_CONFIG } from "@/config";
 import { activitySchema } from "@/types";
 import * as React from "react"
@@ -26,6 +26,7 @@ import {
 import InfoHover from "@/components/InfoHover";
 import ActivateDealButton from "@/components/ActivateBattle";
 import BattleSummary from "@/components/BattleSummary";
+import { useAccount } from "wagmi";
 type ActivityFormData = z.infer<typeof activitySchema>;
 
 interface Game {
@@ -51,8 +52,9 @@ export function CreateActivityPage() {
     const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
     const [issue, setIssue] = useState(false);
     const token = localStorage.getItem("accessToken");
+    const { address } = useAccount();
 
-    const [activityID, setActivityID] = useState<number>(1);
+    const [activityID, setActivityID] = useState<number>(0);
     const [rewardPerUser, setRewardPerUser] = useState<number>(0);
     const [maxUsers, setMaxUsers] = useState<number>(0);
 
@@ -162,8 +164,8 @@ export function CreateActivityPage() {
     const onSubmit = async (data: ActivityFormData) => {
         setIsLoading(true);
         try {
-            if(!token){
-                toast.error("You must be logged in to create an activity");
+            if (!token) {
+                toast.error("You must be logged in to create an battle");
                 return;
             }
             //Save image first
@@ -187,6 +189,7 @@ export function CreateActivityPage() {
                 console.log("Battle created with ID:", response.data.id);
                 toast.success("Battle created successfully!");
                 form.reset();
+                setActivityID(response.data.id);
                 setInstructions([]);
                 setImageFile(null);
                 setSelectedGameId(null);
@@ -198,8 +201,12 @@ export function CreateActivityPage() {
             }
 
         } catch (error) {
-            console.error("Error creating battle:", error);
-            toast.error("Failed to create battle. Please try again.");
+            if (error instanceof AxiosError && error.response.status === 401) {
+                toast.error("Please login to create battle");
+            } else {
+                console.error("Error creating battle:", error);
+                toast.error("Failed to create battle. Please try again.");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -263,396 +270,421 @@ export function CreateActivityPage() {
                         </Card>
                     </div>
 
-                    {/* Game Selection */}
-                    <Card className="border-primary/20 bg-card mb-6">
-                        {activityID === 0 ? <CardHeader>
-                            <CardTitle className="text-2xl font-orbitron flex items-center gap-2">
-                                <Gamepad2 className="h-6 w-6" />
-                                Select Game
-                            </CardTitle>
-                            <CardDescription>
-                                Choose the game for which you want to create an battle
-                            </CardDescription>
-                        </CardHeader> : <CardHeader>
-                            <CardTitle className="text-2xl font-orbitron flex items-center gap-2">
-                                <Gamepad2 className="h-6 w-6" />
-                                Lock Rewards
-                            </CardTitle>
-                            <CardDescription>
-                                Lock the rewards for the battle in our smart contract and pay the 10% commission
-                            </CardDescription>
-                        </CardHeader>}
-
-
-                        <CardContent>
-                            {activityID === 0 ? <Select onValueChange={handleGameSelection} value={selectedGameId?.toString() || ""}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder={isLoadingGames ? "Loading games..." : "Select a game"} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {games.map((game) => (
-                                        <SelectItem key={game.id} value={game.id.toString()}>
-                                            <div className="flex items-center gap-2">
-                                                <span>{game.name}</span>
-                                                <span className="text-xs text-muted-foreground">({game.category})</span>
-                                            </div>
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select> : <ActivateDealButton 
-                                            activityID={activityID} 
-                                            commissionPaid={false} 
-                                            activated={false} 
-                                            rewardPerUser={rewardPerUser} 
-                                            maxUsers={maxUsers}
-                            />}
-                        </CardContent>
-                    </Card>
-
-                    {/* Form - Only show if game is selected */}
-                    {activityID === 0 && selectedGameId && (
-                        <Card className="border-primary/20 bg-card">
-                            <CardHeader>
-                                <CardTitle className="text-2xl font-orbitron">Battle Details</CardTitle>
+                    {token ? <div>
+                        {/* Game Selection */}
+                        <Card className="border-primary/20 bg-card mb-6">
+                            {activityID === 0 ? <CardHeader>
+                                <CardTitle className="text-2xl font-orbitron flex items-center gap-2">
+                                    <Gamepad2 className="h-6 w-6" />
+                                    Select Game
+                                </CardTitle>
                                 <CardDescription>
-                                    Fill in the details for your new battle
+                                    Choose the game for which you want to create an battle
+                                </CardDescription>
+                            </CardHeader> : <CardHeader>
+                                <CardTitle className="text-2xl font-orbitron flex items-center gap-2">
+                                    <Gamepad2 className="h-6 w-6" />
+                                    Lock Rewards
+                                </CardTitle>
+                                <CardDescription>
+                                    Lock the rewards for the battle in our smart contract and pay the 10% commission
+                                </CardDescription>
+                            </CardHeader>}
+
+
+                            <CardContent>
+                                {activityID === 0 ? <Select onValueChange={handleGameSelection} value={selectedGameId?.toString() || ""}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder={isLoadingGames ? "Loading games..." : "Select a game"} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {games.map((game) => (
+                                            <SelectItem key={game.id} value={game.id.toString()}>
+                                                <div className="flex items-center gap-2">
+                                                    <span>{game.name}</span>
+                                                    <span className="text-xs text-muted-foreground">({game.category})</span>
+                                                </div>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select> : <ActivateDealButton
+                                    activityID={activityID}
+                                    commissionPaid={false}
+                                    activated={false}
+                                    rewardPerUser={rewardPerUser}
+                                    maxUsers={maxUsers}
+                                />}
+                            </CardContent>
+                        </Card>
+
+                        {/* Form - Only show if game is selected */}
+                        {activityID === 0 && selectedGameId && (
+                            <Card className="border-primary/20 bg-card">
+                                <CardHeader>
+                                    <CardTitle className="text-2xl font-orbitron">Battle Details</CardTitle>
+                                    <CardDescription>
+                                        Fill in the details for your new battle
+                                    </CardDescription>
+                                </CardHeader>
+
+                                <CardContent>
+                                    <Form {...form}>
+                                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                                            {/* Basic Information */}
+                                            <div className="space-y-4">
+                                                <h3 className="text-lg font-semibold font-rajdhani">Basic Information</h3>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="name"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel className="flex flex-row gap-2 items-center">
+                                                                    <span>Battle Name</span>
+                                                                    <InfoHover info="Name that will be shown in the explore battles page" />
+                                                                </FormLabel>
+                                                                <FormControl>
+                                                                    <Input placeholder="e.g., Survive 100 Waves" {...field} />
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="challenge_id"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel className="flex flex-row gap-2 items-center">
+                                                                    <span>Challenge</span>
+                                                                    <InfoHover info="The action that the player should do to get the reward" />
+                                                                </FormLabel>
+                                                                <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                                                                    <FormControl>
+                                                                        <SelectTrigger>
+                                                                            <SelectValue placeholder={isLoadingChallenges ? "Loading challenges..." : "Select a challenge"} />
+                                                                        </SelectTrigger>
+                                                                    </FormControl>
+                                                                    <SelectContent>
+                                                                        {challenges.map((challenge) => (
+                                                                            <SelectItem key={challenge.id} value={challenge.id.toString()}>
+                                                                                {challenge.name}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                </div>
+
+                                                <FormField
+                                                    control={form.control}
+                                                    name="about"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>About (Optional)</FormLabel>
+                                                            <FormControl>
+                                                                <Textarea
+                                                                    placeholder="Describe the battle and what players need to do..."
+                                                                    className="min-h-[100px]"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+
+                                            {/* Battle Settings */}
+                                            <div className="space-y-4">
+                                                <h3 className="text-lg font-semibold font-rajdhani">Battle Settings</h3>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="goal"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel className="flex flex-row gap-2 items-center">
+                                                                    <span>Goal</span>
+                                                                    <InfoHover info="The number of times the player should perform the action to get the reward" />
+                                                                </FormLabel>
+                                                                <FormControl>
+                                                                    <Input
+                                                                        type="number"
+                                                                        placeholder="e.g., 100"
+                                                                        {...field}
+                                                                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                                                    />
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="reward"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel>Reward (ETH, Optional)</FormLabel>
+                                                                <FormControl>
+                                                                    <Input
+                                                                        type="number"
+                                                                        step="0.001"
+                                                                        placeholder="0.1"
+                                                                        {...field}
+                                                                        onChange={(e) => {
+                                                                            field.onChange(parseFloat(e.target.value) || 0);
+                                                                            setRewardPerUser(parseFloat(e.target.value));
+                                                                        }}
+                                                                    />
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="maximum_num_players"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel className="flex flex-row gap-2 items-center">
+                                                                    <span>Max Players</span>
+                                                                    <InfoHover info="The maximum number of users that can participate in the battle" />
+                                                                </FormLabel>
+                                                                <FormControl>
+                                                                    <Input
+                                                                        type="number"
+                                                                        placeholder="100"
+                                                                        {...field}
+                                                                        onChange={(e) => {
+                                                                            field.onChange(parseInt(e.target.value) || 0);
+                                                                            setMaxUsers(parseInt(e.target.value));
+                                                                        }}
+                                                                    />
+                                                                </FormControl>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <FormField
+                                                        name="startDate"
+                                                        control={form.control}
+                                                        render={({ field }) => (
+                                                            <FormItem className="text-white">
+                                                                <FormLabel className="text-slate-300 block md:inline-block">
+                                                                    <div className="flex flex-row gap-2 items-center pr-2">
+                                                                        <span>Start Date *</span>
+                                                                        <InfoHover info="The date the users can start joining the battle" />
+                                                                    </div>
+                                                                </FormLabel>
+                                                                <Popover>
+                                                                    <PopoverTrigger asChild>
+                                                                        <FormControl>
+                                                                            <Button
+                                                                                variant={"outline"}
+                                                                                className={cn(
+                                                                                    "w-[240px] pl-3 text-left font-normal text-white",
+                                                                                    !field.value && "text-muted-foreground"
+                                                                                )}
+                                                                            >
+                                                                                {field.value ? (
+                                                                                    format(field.value, "PPP")
+                                                                                ) : (
+                                                                                    <span className="text-white">Pick a date</span>
+                                                                                )}
+                                                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50 text-white" />
+                                                                            </Button>
+                                                                        </FormControl>
+                                                                    </PopoverTrigger>
+                                                                    <PopoverContent className="w-auto p-0" align="start">
+                                                                        <Calendar
+                                                                            mode="single"
+                                                                            selected={field.value}
+                                                                            onSelect={field.onChange}
+                                                                            disabled={(date) => {
+                                                                                if (issue === true) {
+                                                                                    return true;
+                                                                                }
+
+                                                                                return date < today
+                                                                            }}
+                                                                            captionLayout="dropdown"
+                                                                        />
+                                                                    </PopoverContent>
+                                                                </Popover>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+
+
+                                                    <FormField
+                                                        name="endDate"
+                                                        control={form.control}
+                                                        render={({ field }) => (
+                                                            <FormItem className="text-white">
+                                                                <FormLabel className="text-slate-300 block md:inline-block">
+                                                                    <div className="flex flex-row gap-2 items-center pr-2">
+                                                                        <span>End date *</span>
+                                                                        <InfoHover info="The last date a player can join a battle" />
+                                                                    </div>
+                                                                </FormLabel>
+                                                                <Popover>
+                                                                    <PopoverTrigger asChild>
+                                                                        <FormControl>
+                                                                            <Button
+                                                                                variant={"outline"}
+                                                                                className={cn(
+                                                                                    "w-[240px] pl-3 text-left font-normal text-white",
+                                                                                    !field.value && "text-muted-foreground"
+                                                                                )}
+                                                                            >
+                                                                                {field.value ? (
+                                                                                    format(field.value, "PPP")
+                                                                                ) : (
+                                                                                    <span className="text-white">Pick a date</span>
+                                                                                )}
+                                                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50 text-white" />
+                                                                            </Button>
+                                                                        </FormControl>
+                                                                    </PopoverTrigger>
+                                                                    <PopoverContent className="w-auto p-0" align="start">
+                                                                        <Calendar
+                                                                            mode="single"
+                                                                            selected={field.value}
+                                                                            onSelect={field.onChange}
+                                                                            disabled={(date) => {
+                                                                                if (issue === true) {
+                                                                                    return true;
+                                                                                }
+
+                                                                                return date < today
+                                                                            }}
+                                                                            captionLayout="dropdown"
+                                                                        />
+                                                                    </PopoverContent>
+                                                                </Popover>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Image Upload */}
+                                            <div className="space-y-4">
+
+
+                                                <FormField
+                                                    control={form.control}
+                                                    name="image"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Battle Image</FormLabel>
+                                                            <FormControl>
+                                                                <div className="flex items-center space-x-4">
+                                                                    <Input
+                                                                        type="file"
+                                                                        accept="image/*"
+                                                                        onChange={(e) => {
+                                                                            const file = e.target.files?.[0];
+                                                                            if (file) {
+                                                                                field.onChange(file);
+                                                                            }
+                                                                        }}
+                                                                        className="flex-1"
+                                                                    />
+                                                                    <Upload className="h-5 w-5 text-muted-foreground" />
+                                                                </div>
+                                                            </FormControl>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+
+                                            {/* Instructions */}
+                                            <div className="space-y-4">
+                                                <h3 className="text-lg font-semibold font-rajdhani">Instructions (Optional)</h3>
+
+                                                <div className="space-y-2">
+                                                    {instructions.map((instruction, index) => (
+                                                        <div key={index} className="flex items-center space-x-2">
+                                                            <Input
+                                                                value={instruction}
+                                                                onChange={(e) => updateInstruction(index, e.target.value)}
+                                                                placeholder={`Instruction ${index + 1}`}
+                                                                className="flex-1"
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => removeInstruction(index)}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        </div>
+                                                    ))}
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={addInstruction}
+                                                    >
+                                                        Add Instruction
+                                                    </Button>
+                                                </div>
+                                            </div>
+
+                                            <Button
+                                                type="submit"
+                                                disabled={isLoading || challenges.length === 0 || !address}
+                                                className="w-full text-lg py-6 bg-gradient-to-r from-primary to-primary-end hover:opacity-90 transition-opacity"
+                                            >
+                                                {isLoading ? "CREATING..." : !address ? "Connect wallet" : "CREATE BATTLE"}
+                                            </Button>
+                                        </form>
+                                    </Form>
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div> : <div>
+                        <Card className="border-primary/20 bg-card mb-6">
+                            <CardHeader>
+                                <CardTitle className="text-2xl font-orbitron flex items-center gap-2">
+                                    <OctagonX className="h-6 w-6"/> 
+                                    Log In
+                                </CardTitle>
+                                <CardDescription>
+                                    You need to login to create a battle
                                 </CardDescription>
                             </CardHeader>
 
+
                             <CardContent>
-                                <Form {...form}>
-                                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                                        {/* Basic Information */}
-                                        <div className="space-y-4">
-                                            <h3 className="text-lg font-semibold font-rajdhani">Basic Information</h3>
-
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <FormField
-                                                    control={form.control}
-                                                    name="name"
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="flex flex-row gap-2 items-center">
-                                                                <span>Battle Name</span>
-                                                                <InfoHover info="Name that will be shown in the explore battles page" />
-                                                            </FormLabel>
-                                                            <FormControl>
-                                                                <Input placeholder="e.g., Survive 100 Waves" {...field} />
-                                                            </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-
-                                                <FormField
-                                                    control={form.control}
-                                                    name="challenge_id"
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="flex flex-row gap-2 items-center">
-                                                                <span>Challenge</span>
-                                                                <InfoHover info="The action that the player should do to get the reward" />
-                                                            </FormLabel>
-                                                            <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
-                                                                <FormControl>
-                                                                    <SelectTrigger>
-                                                                        <SelectValue placeholder={isLoadingChallenges ? "Loading challenges..." : "Select a challenge"} />
-                                                                    </SelectTrigger>
-                                                                </FormControl>
-                                                                <SelectContent>
-                                                                    {challenges.map((challenge) => (
-                                                                        <SelectItem key={challenge.id} value={challenge.id.toString()}>
-                                                                            {challenge.name}
-                                                                        </SelectItem>
-                                                                    ))}
-                                                                </SelectContent>
-                                                            </Select>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
-
-                                            <FormField
-                                                control={form.control}
-                                                name="about"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>About (Optional)</FormLabel>
-                                                        <FormControl>
-                                                            <Textarea
-                                                                placeholder="Describe the battle and what players need to do..."
-                                                                className="min-h-[100px]"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-
-                                        {/* Battle Settings */}
-                                        <div className="space-y-4">
-                                            <h3 className="text-lg font-semibold font-rajdhani">Battle Settings</h3>
-
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <FormField
-                                                    control={form.control}
-                                                    name="goal"
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="flex flex-row gap-2 items-center">
-                                                                <span>Goal</span>
-                                                                <InfoHover info="The number of times the player should perform the action to get the reward" />
-                                                            </FormLabel>
-                                                            <FormControl>
-                                                                <Input
-                                                                    type="number"
-                                                                    placeholder="e.g., 100"
-                                                                    {...field}
-                                                                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                                                                />
-                                                            </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-
-                                                <FormField
-                                                    control={form.control}
-                                                    name="reward"
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel>Reward (ETH, Optional)</FormLabel>
-                                                            <FormControl>
-                                                                <Input
-                                                                    type="number"
-                                                                    step="0.001"
-                                                                    placeholder="0.1"
-                                                                    {...field}
-                                                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                                                                />
-                                                            </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-
-                                                <FormField
-                                                    control={form.control}
-                                                    name="maximum_num_players"
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="flex flex-row gap-2 items-center">
-                                                                <span>Max Players</span>
-                                                                <InfoHover info="The maximum number of users that can participate in the battle" />
-                                                            </FormLabel>
-                                                            <FormControl>
-                                                                <Input
-                                                                    type="number"
-                                                                    placeholder="100"
-                                                                    {...field}
-                                                                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                                                                />
-                                                            </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
-
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <FormField
-                                                    name="startDate"
-                                                    control={form.control}
-                                                    render={({ field }) => (
-                                                        <FormItem className="text-white">
-                                                            <FormLabel className="text-slate-300 block md:inline-block">
-                                                                <div className="flex flex-row gap-2 items-center pr-2">
-                                                                    <span>Start Date *</span>
-                                                                    <InfoHover info="The date the users can start joining the battle" />
-                                                                </div>
-                                                            </FormLabel>
-                                                            <Popover>
-                                                                <PopoverTrigger asChild>
-                                                                    <FormControl>
-                                                                        <Button
-                                                                            variant={"outline"}
-                                                                            className={cn(
-                                                                                "w-[240px] pl-3 text-left font-normal text-white",
-                                                                                !field.value && "text-muted-foreground"
-                                                                            )}
-                                                                        >
-                                                                            {field.value ? (
-                                                                                format(field.value, "PPP")
-                                                                            ) : (
-                                                                                <span className="text-white">Pick a date</span>
-                                                                            )}
-                                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50 text-white" />
-                                                                        </Button>
-                                                                    </FormControl>
-                                                                </PopoverTrigger>
-                                                                <PopoverContent className="w-auto p-0" align="start">
-                                                                    <Calendar
-                                                                        mode="single"
-                                                                        selected={field.value}
-                                                                        onSelect={field.onChange}
-                                                                        disabled={(date) => {
-                                                                            if (issue === true) {
-                                                                                return true;
-                                                                            }
-
-                                                                            return date < today
-                                                                        }}
-                                                                        captionLayout="dropdown"
-                                                                    />
-                                                                </PopoverContent>
-                                                            </Popover>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-
-
-                                                <FormField
-                                                    name="endDate"
-                                                    control={form.control}
-                                                    render={({ field }) => (
-                                                        <FormItem className="text-white">
-                                                            <FormLabel className="text-slate-300 block md:inline-block">
-                                                                <div className="flex flex-row gap-2 items-center pr-2">
-                                                                    <span>End date *</span>
-                                                                    <InfoHover info="The last date a player can join a battle" />
-                                                                </div>
-                                                            </FormLabel>
-                                                            <Popover>
-                                                                <PopoverTrigger asChild>
-                                                                    <FormControl>
-                                                                        <Button
-                                                                            variant={"outline"}
-                                                                            className={cn(
-                                                                                "w-[240px] pl-3 text-left font-normal text-white",
-                                                                                !field.value && "text-muted-foreground"
-                                                                            )}
-                                                                        >
-                                                                            {field.value ? (
-                                                                                format(field.value, "PPP")
-                                                                            ) : (
-                                                                                <span className="text-white">Pick a date</span>
-                                                                            )}
-                                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50 text-white" />
-                                                                        </Button>
-                                                                    </FormControl>
-                                                                </PopoverTrigger>
-                                                                <PopoverContent className="w-auto p-0" align="start">
-                                                                    <Calendar
-                                                                        mode="single"
-                                                                        selected={field.value}
-                                                                        onSelect={field.onChange}
-                                                                        disabled={(date) => {
-                                                                            if (issue === true) {
-                                                                                return true;
-                                                                            }
-
-                                                                            return date < today
-                                                                        }}
-                                                                        captionLayout="dropdown"
-                                                                    />
-                                                                </PopoverContent>
-                                                            </Popover>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Image Upload */}
-                                        <div className="space-y-4">
-
-
-                                            <FormField
-                                                control={form.control}
-                                                name="image"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Battle Image</FormLabel>
-                                                        <FormControl>
-                                                            <div className="flex items-center space-x-4">
-                                                                <Input
-                                                                    type="file"
-                                                                    accept="image/*"
-                                                                    onChange={(e) => {
-                                                                        const file = e.target.files?.[0];
-                                                                        if (file) {
-                                                                            field.onChange(file);
-                                                                        }
-                                                                    }}
-                                                                    className="flex-1"
-                                                                />
-                                                                <Upload className="h-5 w-5 text-muted-foreground" />
-                                                            </div>
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-
-                                        {/* Instructions */}
-                                        <div className="space-y-4">
-                                            <h3 className="text-lg font-semibold font-rajdhani">Instructions (Optional)</h3>
-
-                                            <div className="space-y-2">
-                                                {instructions.map((instruction, index) => (
-                                                    <div key={index} className="flex items-center space-x-2">
-                                                        <Input
-                                                            value={instruction}
-                                                            onChange={(e) => updateInstruction(index, e.target.value)}
-                                                            placeholder={`Instruction ${index + 1}`}
-                                                            className="flex-1"
-                                                        />
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => removeInstruction(index)}
-                                                        >
-                                                            Remove
-                                                        </Button>
-                                                    </div>
-                                                ))}
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    onClick={addInstruction}
-                                                >
-                                                    Add Instruction
-                                                </Button>
-                                            </div>
-                                        </div>
-
-                                        <Button
-                                            type="submit"
-                                            disabled={isLoading || challenges.length === 0}
-                                            className="w-full text-lg py-6 bg-gradient-to-r from-primary to-primary-end hover:opacity-90 transition-opacity"
-                                        >
-                                            {isLoading ? "CREATING..." : "CREATE BATTLE"}
-                                        </Button>
-                                    </form>
-                                </Form>
+                                
                             </CardContent>
                         </Card>
-                    )}
+                    </div>}
                 </div>
 
-                <BattleSummary 
-                    rewardPerUser={rewardPerUser} 
-                    totalFunding={totalFunding} 
-                    maxUsers={maxUsers} 
-                    platformCommission={platformCommission} 
-                    totalRequired={totalRequired} 
+                <BattleSummary
+                    rewardPerUser={rewardPerUser}
+                    totalFunding={totalFunding}
+                    maxUsers={maxUsers}
+                    platformCommission={platformCommission}
+                    totalRequired={totalRequired}
                 />
             </div>
         </div>
