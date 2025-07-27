@@ -4,13 +4,13 @@ export const challengeSchema = z.object({
     player_address_variable: z.string().min(1, "Player address variable is required"),
     function_name: z.string().min(1, "Function name is required"),
     useForwarder: z.boolean(),
-    forwarderAddress: z.string().optional(),
-    forwarderABI: z.string().optional(),
-    methodDataAttributeName: z.string().optional(),
-    wantedData: z.string().optional(),
+    forwarderAddress: z.string().nullable(),
+    forwarderABI: z.string().nullable(),
+    methodDataAttributeName: z.string().nullable(),
+    wantedData: z.string().nullable(),
     countItems: z.boolean(),
     contract_address: z.string().min(1, "Contract address is required"),
-    abi: z.any().optional(),
+    abi: z.any().nullable(),
 });
 export const gameSchema = z.object({
     name: z.string().min(1, "Game name is required"),
