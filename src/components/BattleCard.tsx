@@ -2,14 +2,15 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FeaturedDeal } from "@/types";
-import { Calendar, Users, Trophy, Clock } from "lucide-react";
+import { Calendar, Users, Trophy, Clock, Eye } from "lucide-react";
 import BattleCardActionButton from "./BattleCardActionButton";
 import { useAccount } from "wagmi";
+import { Link } from "react-router-dom";
 
 const ACTIVITY_IMAGE_URL = import.meta.env.VITE_ACTIVITY_IMAGE_URL;
 
 export function BattleCard(props: FeaturedDeal) {
-  const {address} = useAccount();
+  const { address } = useAccount();
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -38,7 +39,7 @@ export function BattleCard(props: FeaturedDeal) {
             className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          
+
           {/* Status Badge */}
           <Badge
             className={`absolute top-3 right-3 font-rajdhani font-semibold text-white ${getStatusColor(
@@ -60,9 +61,14 @@ export function BattleCard(props: FeaturedDeal) {
 
       <CardContent className="p-6 space-y-4">
         {/* Battle Name */}
-        <h3 className="font-orbitron font-bold text-xl text-foreground group-hover:text-accent transition-colors">
-          {props.name || "Battle"}
-        </h3>
+        <div className="flex flex-row justify-between items-center">
+          <h3 className="font-orbitron font-bold text-xl text-foreground group-hover:text-accent transition-colors">
+            {props.name || "Battle"}
+          </h3>
+          <Link to={`/battles/${props.id}`}>
+            <Eye className="h-5 w-5 text-white hover:text-accent" />
+          </Link>
+        </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4">
@@ -94,7 +100,15 @@ export function BattleCard(props: FeaturedDeal) {
         </div>
 
         {/* Action Button */}
-        <BattleCardActionButton playerCount={props.playerCount} maxPlayers={props.maxPlayers} id={props.id} status={props.status} joined={joined}/>
+        <BattleCardActionButton
+          playerCount={props.playerCount}
+          maxPlayers={props.maxPlayers}
+          id={props.id}
+          status={props.status}
+          joined={joined}
+          commissionPaid={props.commissionPaid}
+          rewardLocked={props.rewardLocked}
+        />
       </CardContent>
     </Card>
   );
