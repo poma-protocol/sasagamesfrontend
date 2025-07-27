@@ -63,6 +63,7 @@ export default function BattleCardActionButton(props: BattleCardActionButtonProp
                     });
 
                     setLoading(false);
+                    setJoined(true);
                     toast.success("Joined battle");
                 } catch (err) {
                     setLoading(false);
