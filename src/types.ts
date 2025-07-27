@@ -26,9 +26,14 @@ export const featuredDealsSchema = z.object({
     playerCount: z.number(),
     maxPlayers: z.number(),
     startDate: z.string(),
+    goal: z.number(),
     endDate: z.string(),
     status: z.enum(["upcoming", "active", "completed"]),
-    players: z.array(z.string())
+    players: z.array(z.string()),
+    commissionPaid: z.boolean(),
+    rewardLocked: z.boolean(),
+    instructions: z.array(z.string()),
+    about: z.string().nullable()
 });
 
 export const activitySchema = z.object({
@@ -69,6 +74,14 @@ export const gameChallengesSchema = z.object({
     countItems: z.boolean(),
     battles: z.number()
 });
+
+export const gameDetailsSchema = z.object({
+    name: z.string(),
+    image: z.string(),
+    category: z.string(),
+    createdAt: z.string()
+});
+
 export interface MyBattle {
     id: number;
     name: string;
@@ -84,15 +97,21 @@ export interface MyBattle {
 export interface Activity {
     id: number,
     name: string,
+    about: string | null,
     reward: number | null,
     image: string,
     startDate: string,
     endDate: string,
+    goal: number,
     playerCount: number,
     maxPlayers: number,
-    status: string
+    status: string,
+    commissionPaid: boolean,
+    rewardLocked: boolean,
+    instructions: string[],
 }
 
+export type GameDetails = z.infer<typeof gameDetailsSchema>;
 export type GamesChallenges = z.infer<typeof gameChallengesSchema>;
 export type FilteredGames = z.infer<typeof filteredGamesSchema>;
 export type GameCategories = z.infer<typeof gameAndCategoriesSchema>;

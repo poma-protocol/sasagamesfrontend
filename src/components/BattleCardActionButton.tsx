@@ -18,6 +18,8 @@ interface BattleCardActionButtonProps {
     playerCount: number,
     maxPlayers: number,
     joined: boolean,
+    commissionPaid: boolean,
+    rewardLocked: boolean,
 }
 
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
