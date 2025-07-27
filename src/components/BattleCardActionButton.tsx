@@ -18,6 +18,8 @@ interface BattleCardActionButtonProps {
     playerCount: number,
     maxPlayers: number,
     joined: boolean,
+    commissionPaid: boolean,
+    rewardLocked: boolean,
 }
 
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -63,6 +65,7 @@ export default function BattleCardActionButton(props: BattleCardActionButtonProp
                     });
 
                     setLoading(false);
+                    setJoined(true);
                     toast.success("Joined battle");
                 } catch (err) {
                     setLoading(false);

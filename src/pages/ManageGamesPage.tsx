@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,11 +19,10 @@ export function ManageGamesPage() {
     const [selectedCategory, setSelectedCategory] = useState("");
     const [games, setGames] = useState<FilteredGames[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
-    const [selectedGame, setSelectedGame] = useState<number | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
-    const [challengesLoading, setChallengesLoading] = useState<boolean>(false);
-    const [challenges, setChallenges] = useState<GamesChallenges[]>([])
+    const navigate = useNavigate();
     const token = localStorage.getItem("accessToken");
+
     useEffect(() => {
         const getInitialGames = async () => {
             try {
@@ -97,36 +96,6 @@ export function ManageGamesPage() {
             toast.error("Could not filter games");
         }
     }
-
-    async function getChallenges(id: number) {
-        try {
-            setChallengesLoading(true);
-
-            const data = await axios.get(`${VITE_BACKEND}/game/challenges/${id}`);
-            const challengesFromBackend: GamesChallenges[] = [];
-
-            for (const d of data.data) {
-                const parsed = gameChallengesSchema.safeParse(d);
-                if (parsed.success) {
-                    challengesFromBackend.push(parsed.data);
-                }
-            }
-
-            setChallenges(challengesFromBackend);
-            setChallengesLoading(false);
-        } catch (err) {
-            setChallengesLoading(false);
-            console.error("Error getting game's challenges", err);
-            toast.error("Error getting game challenges");
-        }
-    }
-
-    const handleGameClick = (gameId: number) => {
-        if (gameId !== selectedGame) {
-            getChallenges(gameId);
-        }
-        setSelectedGame(gameId === selectedGame ? null : gameId);
-    };
 
     const totalStats = {
         totalGames: games.length,
@@ -267,11 +236,10 @@ export function ManageGamesPage() {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => handleGameClick(game.id)}
+                                            onClick={() => navigate(`/game-admin/details/${game.id}`)}
                                             className="font-rajdhani"
                                         >
                                             <Eye className="h-4 w-4 mr-2" />
-                                            {selectedGame === game.id ? "Hide" : "View"}
                                         </Button>
                                     </div>
                                 </div>
@@ -292,58 +260,6 @@ export function ManageGamesPage() {
                                         <p className="text-sm text-muted-foreground font-rajdhani">Players</p>
                                     </div>
                                 </div>
-
-                                {selectedGame === game.id && (
-                                    <div className="border-t pt-4 space-y-4">
-                                        <div className="flex justify-between items-center">
-                                            <h3 className="text-lg font-semibold font-rajdhani flex items-center gap-2">
-                                                <Zap className="h-5 w-5 text-accent" />
-                                                Game Activities
-                                            </h3>
-                                            <div className="flex gap-2">
-                                                <Link to="/manage-activities">
-                                                    <Button size="sm" variant="outline" className="font-rajdhani">
-                                                        <Settings className="h-4 w-4 mr-2" />
-                                                        Manage All
-                                                    </Button>
-                                                </Link>
-                                                <Button size="sm" variant="outline" className="font-rajdhani">
-                                                    <Plus className="h-4 w-4 mr-2" />
-                                                    Add Activity
-                                                </Button>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-3">
-                                            {challengesLoading === false ? challenges.map((challenge) => (
-                                                <div key={challenge.id} className="flex items-center justify-between p-4 bg-secondary/10 rounded-lg border border-secondary/20">
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center gap-3 mb-1">
-                                                            <p className="font-medium font-rajdhani">{challenge.name}</p>
-                                                        </div>
-                                                        <p className="text-sm text-muted-foreground font-rajdhani">
-                                                            Function: <code className="bg-muted px-1 rounded">{challenge.function_name}</code> •
-                                                            Player Variable: <code className="bg-muted px-1 rounded">{challenge.player_address_variable}</code> •
-                                                            {challenge.battles} battles
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <Link to="/create-battle">
-                                                            <Button size="sm" variant="outline" className="font-rajdhani">
-                                                                Create Battle
-                                                            </Button>
-                                                        </Link>
-                                                        <Button size="sm" variant="outline" className="font-rajdhani">
-                                                            <Settings className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            )) : <div className="text-center my-6">
-                                                Getting challenges...
-                                            </div>}
-                                        </div>
-                                    </div>
-                                )}
                             </CardContent>
                         </Card>
                     )) : <div className="text-center my-6">
