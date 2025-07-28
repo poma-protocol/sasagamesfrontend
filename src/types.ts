@@ -18,6 +18,7 @@ export const gameSchema = z.object({
     image: z.instanceof(File).optional(),
     challenges: z.array(challengeSchema).min(1, "At least one challenge is required"),
 });
+
 export const featuredDealsSchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -80,6 +81,20 @@ export const gameDetailsSchema = z.object({
     image: z.string(),
     category: z.string(),
     createdAt: z.string()
+});
+
+export const createChallengeSchema = z.object({
+    name: z.string({ message: "Please enter name" }),
+    player_address_variable: z.string({ message: "Please enter player address variable" }),
+    function_name: z.string({ message: "Please enter function name" }),
+    useForwarder: z.boolean().default(false),
+    forwarderAddress: z.string({ message: "Please enter forwarder address" }).regex(/^(0x)?[0-9a-fA-F]{40}$/, {message: "Forwarder address must be a valid ethereum address"}).optional().nullable(),
+    forwarderABI: z.any().optional().nullable(),
+    methodDataAttributeName: z.string({ message: "Enter item attribute" }).optional().nullable(),
+    wantedData: z.string({ message: "Enter wanted data" }).optional().nullable(),
+    countItems: z.boolean().default(false),
+    contract_address: z.string({ message: "Please enter contract address" }).regex(/^(0x)?[0-9a-fA-F]{40}$/, {message: "Contract address must be a valid ethereum address"}),
+    abi: z.any(),
 });
 
 export interface MyBattle {

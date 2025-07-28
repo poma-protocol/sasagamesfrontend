@@ -14,6 +14,8 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { FeaturedDeal, featuredDealsSchema, gameChallengesSchema, GameDetails, gameDetailsSchema, GamesChallenges } from "@/types";
 import axios from "axios";
+import { Dialog, DialogClose } from "@radix-ui/react-dialog";
+import { DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 async function getGameDetails(id: number): Promise<GameDetails | null> {
     try {
@@ -160,8 +162,26 @@ export function GameDetailsPage() {
 
                         {/* Battle Features */}
                         <Card className="border-primary/20 bg-card">
-                            <CardHeader>
+                            <CardHeader className="flex flex-row justify-between">
                                 <CardTitle className="font-orbitron">Challenges</CardTitle>
+                                <Dialog>
+                                    <form>
+                                        <DialogTrigger asChild>
+                                            <Button>Add Challenge</Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="sm:max-w-[425px]">
+                                            <DialogHeader>
+                                                <DialogTitle>Create a New Challenge</DialogTitle>
+                                            </DialogHeader>
+                                            
+                                            <DialogFooter>
+                                                <DialogClose asChild>
+                                                    <Button variant="outline">Cancel</Button>
+                                                </DialogClose>
+                                            </DialogFooter>
+                                        </DialogContent>
+                                    </form>
+                                </Dialog>
                             </CardHeader>
                             <CardContent>
                                 <div className="grid gap-6">
