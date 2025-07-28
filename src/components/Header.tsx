@@ -89,7 +89,7 @@ export function Header() {
                         {!isAdminLoggedIn && (<Button className="font-rajdhani font-semibold" onClick={handleAdminLogin}>
                             <Link to="/game-admin/login" className="flex items-center">
                                 <Settings className="h-4 w-4 mr-2" />
-                                Game Admin Login
+                                Get Started As Game Admin
                             </Link>
                         </Button>)}
                         {isAdminLoggedIn ? (
@@ -239,7 +239,7 @@ export function Header() {
                                         className="w-full font-rajdhani font-semibold btn-gradient"
                                     >
                                         <Settings className="h-4 w-4 mr-2" />
-                                        Game Admin Login
+                                        Get Started As Game Admin
                                     </Button>
                                 </>
                             )}

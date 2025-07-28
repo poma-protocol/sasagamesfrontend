@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-    Clock, Trophy, ArrowLeft, Gamepad2, Zap,
+    Clock, ArrowLeft, Gamepad2, Zap,
     Eye,
     Plus
 } from "lucide-react";;
