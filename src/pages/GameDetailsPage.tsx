@@ -16,6 +16,15 @@ import { FeaturedDeal, featuredDealsSchema, gameChallengesSchema, GameDetails, g
 import axios from "axios";
 import { Dialog, DialogClose } from "@radix-ui/react-dialog";
 import { DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useForm } from "react-hook-form";
+import z from "zod";
+import { createChallengeSchema } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import InfoHover from "@/components/InfoHover";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 
 async function getGameDetails(id: number): Promise<GameDetails | null> {
     try {
@@ -74,6 +83,35 @@ export function GameDetailsPage() {
         queryFn: () => getGameChallenges(Number(id)),
         enabled: !!id
     })
+
+    const form = useForm<z.infer<typeof createChallengeSchema>>({
+        resolver: zodResolver(createChallengeSchema),
+        defaultValues: {
+            name: "",
+            player_address_variable: "",
+            function_name: "",
+            useForwarder: false,
+            forwarderAddress: null,
+            forwarderABI: null,
+            methodDataAttributeName: null,
+            wantedData: null,
+            countItems: false,
+            contract_address: "",
+            abi: null,
+        }
+    });
+
+    async function addChallenge(data: z.infer<typeof createChallengeSchema>) {
+        try {
+            await axios.post(`${API_CONFIG.BACKEND_URL}/game/challenge/battle`, {
+                gameID: Number(id),
+                ...data
+            });
+            toast.success("Created challenge");
+        } catch (err) {
+            toast.error("Could not add challenge");
+        }
+    }
 
     if (isLoading) {
         return <div className="flex flex-col space-y-3">
@@ -165,22 +203,233 @@ export function GameDetailsPage() {
                             <CardHeader className="flex flex-row justify-between">
                                 <CardTitle className="font-orbitron">Challenges</CardTitle>
                                 <Dialog>
-                                    <form>
-                                        <DialogTrigger asChild>
-                                            <Button>Add Challenge</Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="sm:max-w-[425px]">
-                                            <DialogHeader>
-                                                <DialogTitle>Create a New Challenge</DialogTitle>
-                                            </DialogHeader>
-                                            
-                                            <DialogFooter>
-                                                <DialogClose asChild>
-                                                    <Button variant="outline">Cancel</Button>
-                                                </DialogClose>
-                                            </DialogFooter>
-                                        </DialogContent>
-                                    </form>
+                                    <DialogTrigger asChild>
+                                        <Button>Add Challenge</Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-4xl">
+                                        <Form {...form}>
+                                            <form onSubmit={form.handleSubmit(addChallenge)} className="space-y-8">
+
+
+                                                <DialogHeader>
+                                                    <DialogTitle>Create a New Challenge</DialogTitle>
+                                                </DialogHeader>
+                                                <Card className="border-secondary/20 bg-secondary/5">
+                                                    <CardContent className="space-y-4">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <FormField
+                                                                control={form.control}
+                                                                name={`name`}
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel className="flex flex-row gap-2 items-center">
+                                                                            <span>Challenge Name</span>
+                                                                            <InfoHover info="Name of the action you want to track. It can be anything" />
+                                                                        </FormLabel>
+                                                                        <FormControl>
+                                                                            <Input placeholder="e.g., Survive 100 Waves" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+
+                                                            <FormField
+                                                                control={form.control}
+                                                                name={`contract_address`}
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel className="flex flex-row gap-2 items-center">
+                                                                            <span>Contract Address</span>
+                                                                            <InfoHover info="Address of the smart contract that's called when player performs action" />
+                                                                        </FormLabel>
+                                                                        <FormControl>
+                                                                            <Input placeholder="0x..." {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                        </div>
+
+                                                        <FormField
+                                                            control={form.control}
+                                                            name={`abi`}
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormLabel className="flex flex-row gap-2 items-center">
+                                                                        <span>Contract ABI</span>
+                                                                        <InfoHover info="ABI of the smart contract called" />
+                                                                    </FormLabel>
+                                                                    <FormControl>
+                                                                        <Textarea
+                                                                            placeholder='[{"inputs":[{"name":"x","type":"uint256"}],"name":"increment","outputs":[{"name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"}]'
+                                                                            {...field}
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <FormField
+                                                                control={form.control}
+                                                                name={`function_name`}
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel className="flex flex-row gap-2 items-center">
+                                                                            <span>Function Name</span>
+                                                                            <InfoHover info="The name of the smart contract function that's executed when the player performs the action" />
+                                                                        </FormLabel>
+                                                                        <FormControl>
+                                                                            <Input placeholder="e.g., completeWave" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+
+                                                            <FormField
+                                                                control={form.control}
+                                                                name={`player_address_variable`}
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel className="flex flex-row gap-2 items-center">
+                                                                            <span>Player Address Variable</span>
+                                                                            <InfoHover info="The name of the parameter in the smart contract function executed by the action that stores the player's address" />
+                                                                        </FormLabel>
+                                                                        <FormControl>
+                                                                            <Input placeholder="e.g., playerAddress" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                        </div>
+
+                                                        <FormField
+                                                            control={form.control}
+                                                            name={`useForwarder`}
+                                                            render={({ field }) => (
+                                                                <FormItem className="flex items-center space-x-2">
+                                                                    <FormControl>
+                                                                        <Switch
+                                                                            checked={field.value}
+                                                                            onCheckedChange={field.onChange}
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormLabel className="flex flex-row gap-2 items-center">
+                                                                        <span>Use Forwarder</span>
+                                                                        <InfoHover info="There are games that use a proxy smart contract that forwards transactions to other contracts responsible for handling in game actions. If you use a proxy contract please check this and enter its details below" />
+                                                                    </FormLabel>
+                                                                </FormItem>
+                                                            )}
+                                                        />
+
+                                                        {form.watch(`useForwarder`) && (
+                                                            <div className="grid grid-cols-1 gap-4">
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name={`forwarderAddress`}
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <FormLabel className="flex flex-row gap-2 items-center">
+                                                                                <span>Forwarder Address</span>
+                                                                                <InfoHover info="Address of the proxy smart contract" />
+                                                                            </FormLabel>
+                                                                            <FormControl>
+                                                                                <Input placeholder="0x..." {...field} />
+                                                                            </FormControl>
+                                                                            <FormMessage />
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+
+                                                                <FormField
+                                                                    control={form.control}
+                                                                    name={`forwarderABI`}
+                                                                    render={({ field }) => (
+                                                                        <FormItem>
+                                                                            <FormLabel className="flex flex-row gap-2 items-center">
+                                                                                <span>Forwarder ABI</span>
+                                                                                <InfoHover info="ABI of the proxy smartcontract" />
+                                                                            </FormLabel>
+                                                                            <FormControl>
+                                                                                <Textarea
+                                                                                    placeholder='Forwarder ABI JSON'
+                                                                                    {...field}
+                                                                                />
+                                                                            </FormControl>
+                                                                            <FormMessage />
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                            </div>
+                                                        )}
+
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <FormField
+                                                                control={form.control}
+                                                                name={`methodDataAttributeName`}
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel className="flex flex-row gap-2 items-center">
+                                                                            <span>Item Variable</span>
+                                                                            <InfoHover info="If the player interacts with something else in the action and you want to check for that other item you can give the name of the parameter that stores that other item in the smart contract function" />
+                                                                        </FormLabel>
+                                                                        <FormControl>
+                                                                            <Input placeholder="e.g., methodData" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+
+                                                            <FormField
+                                                                control={form.control}
+                                                                name={`wantedData`}
+                                                                render={({ field }) => (
+                                                                    <FormItem>
+                                                                        <FormLabel className="flex flex-row gap-2 items-center">
+                                                                            <span>Wanted Data</span>
+                                                                            <InfoHover info="The value of the item that you're checking for" />
+                                                                        </FormLabel>
+                                                                        <FormControl>
+                                                                            <Input placeholder="e.g., waveNumber" {...field} />
+                                                                        </FormControl>
+                                                                        <FormMessage />
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                        </div>
+
+                                                        <FormField
+                                                            control={form.control}
+                                                            name={`countItems`}
+                                                            render={({ field }) => (
+                                                                <FormItem className="flex items-center space-x-2">
+                                                                    <FormControl>
+                                                                        <Switch
+                                                                            checked={field.value}
+                                                                            onCheckedChange={field.onChange}
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormLabel className="flex flex-row gap-2 items-center">
+                                                                        <span>Count Items</span>
+                                                                        <InfoHover info="If the player can interact with multiple items in the action, check this to count them and have that count contribute to the goal" />
+                                                                    </FormLabel>
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    </CardContent>
+                                                </Card>
+                                                <DialogFooter>
+                                                    <Button type="submit" variant="outline">Create</Button>
+                                                </DialogFooter>
+                                            </form>
+                                        </Form>
+                                    </DialogContent>
                                 </Dialog>
                             </CardHeader>
                             <CardContent>
