@@ -76,7 +76,7 @@ export function BattleDetailPage() {
                                     {/* Status and Difficulty */}
                                     <div className="absolute top-4 right-4 flex gap-2">
                                         <Badge className="bg-primary text-primary-foreground font-rajdhani">
-                                            {getBattleStatus(battle).toUpperCase()}
+                                            {battle.status.toUpperCase()}
                                         </Badge>
 
                                     </div>
@@ -234,7 +234,15 @@ export function BattleDetailPage() {
                                     </div>
                                 </div>
                                 <Separator />
-                                <BattleCardActionButton id={battle.id} status={battle.status} maxPlayers={battle.maxPlayers} playerCount={battle.playerCount} joined={joined}/>
+                                <BattleCardActionButton 
+                                    id={battle.id} 
+                                    status={battle.status} 
+                                    maxPlayers={battle.maxPlayers} 
+                                    playerCount={battle.playerCount} 
+                                    joined={joined} 
+                                    commissionPaid={battle.commissionPaid}
+                                    rewardLocked={battle.rewardLocked}
+                                />
 
                             </CardContent>
                         </Card>
@@ -249,12 +257,12 @@ export function BattleDetailPage() {
                                     <div className="text-center">
                                         <Calendar className="h-6 w-6 mx-auto mb-2 text-primary" />
                                         <p className="text-xs text-muted-foreground font-rajdhani">Start Date</p>
-                                        <p className="font-rajdhani font-semibold">{formatDate(battle.startDate)}</p>
+                                        <p className="font-rajdhani font-semibold">{battle.startDate}</p>
                                     </div>
                                     <div className="text-center">
                                         <Clock className="h-6 w-6 mx-auto mb-2 text-primary" />
                                         <p className="text-xs text-muted-foreground font-rajdhani">End Date</p>
-                                        <p className="font-rajdhani font-semibold">{formatDate(battle.endDate)}</p>
+                                        <p className="font-rajdhani font-semibold">{battle.endDate}</p>
                                     </div>
 
 
@@ -281,22 +289,3 @@ async function fetchActivity(activityId: number) {
     }
 
 }
-function getBattleStatus(battle: Activity) {
-    const currentDate = new Date();
-    const startDate = new Date(battle.startDate);
-    const endDate = new Date(battle.endDate);
-    if (currentDate < startDate) {
-        return "upcoming";
-    } else if (currentDate >= startDate && currentDate <= endDate) {
-        return "active";
-    } else {
-        return "completed";
-    }
-}
-const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-    });
-};
