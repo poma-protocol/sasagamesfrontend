@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-    Clock, Trophy, ArrowLeft, Gamepad2, Zap,
+    Clock, ArrowLeft, Gamepad2, Zap,
     Eye,
     Plus
 } from "lucide-react";;
@@ -25,6 +25,7 @@ import InfoHover from "@/components/InfoHover";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import ActivateDealButton from "@/components/ActivateBattle";
 
 async function getGameDetails(id: number): Promise<GameDetails | null> {
     try {
@@ -128,6 +129,11 @@ export function GameDetailsPage() {
 
     async function handleChallengeClick(id: number) {
         try {
+            if (id === selectedChallenge) {
+                setSelectedChallenge(0);
+                return;
+            }
+            
             setSelectedChallenge(id);
             setBattlesLoading(true);
 
@@ -201,7 +207,13 @@ export function GameDetailsPage() {
                         {/* Battle Features */}
                         <Card className="border-primary/20 bg-card">
                             <CardHeader className="flex flex-row justify-between">
-                                <CardTitle className="font-orbitron">Challenges</CardTitle>
+                                <CardTitle className="font-orbitron flex flex-row gap-2">
+                                    <h2>Challenges</h2>
+                                    <InfoHover info="
+                                        A challenge describes something the player can do in the game that they can be rewarded for.
+                                        A battle determines the number of times the player should perform the action in the challenge to get the reward
+                                    " />
+                                </CardTitle>
                                 <Dialog>
                                     <DialogTrigger asChild>
                                         <Button>Add Challenge</Button>
@@ -501,8 +513,11 @@ export function GameDetailsPage() {
                                                                                     className="w-24 h-24 rounded-lg object-cover border border-primary/20"
                                                                                 />
                                                                                 <div>
-                                                                                    <CardTitle className="text-xl font-orbitron flex items-center gap-2">
-                                                                                        {battle.name}
+                                                                                    <CardTitle className="text-xl font-orbitron flex items-center gap-3">
+                                                                                        <h2>{battle.name}</h2>
+                                                                                        <Badge className="bg-primary text-primary-foreground font-rajdhani">
+                                                                                            {battle.status.toUpperCase()}
+                                                                                        </Badge>
                                                                                     </CardTitle>
                                                                                     <CardDescription className="flex items-center gap-2 mt-2">
                                                                                         <Badge variant="secondary" className="font-rajdhani">{game.category}</Badge>
@@ -532,6 +547,13 @@ export function GameDetailsPage() {
                                                                                 <p className="text-2xl font-bold text-yellow-400 font-orbitron">{battle.playerCount}</p>
                                                                                 <p className="text-sm text-muted-foreground font-rajdhani">Players</p>
                                                                             </div>
+                                                                            <ActivateDealButton
+                                                                                activityID={battle.id}
+                                                                                commissionPaid={battle.commissionPaid}
+                                                                                activated={battle.rewardLocked}
+                                                                                rewardPerUser={battle.reward}
+                                                                                maxUsers={battle.maxPlayers}
+                                                                            />
                                                                         </div>
                                                                     </CardContent>
                                                                 </Card>
