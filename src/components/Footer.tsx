@@ -32,9 +32,6 @@ export function Footer() {
               <Link to="/my-battles" className="block text-muted-foreground hover:text-accent transition-colors font-rajdhani">
                 My Battles
               </Link>
-              <Link to="/quests" className="block text-muted-foreground hover:text-accent transition-colors font-rajdhani">
-                Battles
-              </Link>
             </div>
           </div>
 
@@ -65,7 +62,7 @@ export function Footer() {
                   <Twitter className="h-5 w-5" />
                 </a>
                 <a
-                  href="https://github.com/sasagames"
+                  href="https://github.com/poma-protocol/arbitrum-integration"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-accent transition-colors"
@@ -73,15 +70,7 @@ export function Footer() {
                   <Github className="h-5 w-5" />
                 </a>
                 <a
-                  href="https://discord.gg/sasagames"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-accent transition-colors"
-                >
-                  <MessageCircle className="h-5 w-5" />
-                </a>
-                <a
-                  href="mailto:contact@sasagames.com"
+                  href="mailto:info@sasagames.com"
                   className="text-muted-foreground hover:text-accent transition-colors"
                 >
                   <Mail className="h-5 w-5" />
