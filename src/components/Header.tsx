@@ -30,9 +30,9 @@ export function Header() {
         { name: "Create Activity", path: "/game-admin/create-activity" },
     ];
 
-    const handleAdminLogin = () => {
-        navigate("/game-admin/login");
-    };
+    // const handleAdminLogin = () => {
+    //     navigate("/game-admin/login");
+    // };
 
     const handleAdminLogout = () => {
         if (!token) return;

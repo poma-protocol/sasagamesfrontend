@@ -1,5 +1,5 @@
 import { useState, useEffect, Suspense } from "react";
-import { Await, Link, useLoaderData } from "react-router-dom";
+import { Await, Link, useLoaderData, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { BattleCard } from "@/components/BattleCard";
@@ -11,7 +11,8 @@ import {
   Target,
   Star,
   ArrowRight,
-  PlayCircle
+  PlayCircle,
+  Settings
 } from "lucide-react";
 import heroImage from "@/assets/hero-gaming.jpg";
 import { FeaturedDeal } from "@/types";
@@ -87,6 +88,7 @@ function FeaturedDeals() {
 export function LandingPage() {
   const [typedText, setTypedText] = useState("");
   const fullText = "Play. Earn. Repeat.";
+  const navigate = useNavigate();
 
   useEffect(() => {
     let index = 0;
@@ -101,6 +103,10 @@ export function LandingPage() {
 
     return () => clearInterval(timer);
   }, []);
+
+  const handleAdminLogin = () => {
+    navigate("/game-admin/login");
+  };
 
   return (
     <div className="min-h-screen">
@@ -291,9 +297,31 @@ export function LandingPage() {
               Join the future of gaming where skill meets reward. Start your journey today and turn your gaming passion into profit.
             </p>
             <Link to="/battles">
-              <Button size="lg" className="btn-gradient text-xl px-12 py-6 font-rajdhani font-bold pulse-glow">
+              <Button size="lg" className="btn-gradient text-xl px-12 py-6 font-rajdhani font-bold pulse-glow" onClick={handleAdminLogin}>
                 START PLAYING NOW
                 <Zap className="ml-3 h-6 w-6" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits of registering game on platform */}
+      <section className="py-20">
+        <div className="container mx-auto px-4 text-center">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="font-orbitron font-bold text-4xl md:text-6xl mb-6">
+              FOR <span className="text-gradient">GAME DEVELOPERS</span>?
+            </h2>
+            <p className="font-rajdhani text-xl text-muted-foreground mb-8">
+              Transform your game into a Web3 powerhouse. Create engaging challenges, reward loyal players, and boost retention with blockchain-powered competitions that players can't resist.
+            </p>
+            <Link to="/battles">
+              <Button size="lg" className="btn-gradient text-xl px-12 py-6 font-rajdhani font-bold pulse-glow">
+                <Link to="/game-admin/login" className="flex items-center">
+                  <Settings className="h-4 w-4 mr-2" />
+                  GET STARTED AS GAME ADMIN
+                </Link>
               </Button>
             </Link>
           </div>
