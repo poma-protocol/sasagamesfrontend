@@ -244,48 +244,6 @@ export function LandingPage() {
         </div>
       </section>
 
-
-      {/* Testimonials */}
-      <section className="py-20 bg-card">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="font-orbitron font-bold text-4xl md:text-5xl mb-4">
-              PLAYER <span className="text-gradient">TESTIMONIALS</span>
-            </h2>
-            <p className="font-rajdhani text-xl text-muted-foreground">
-              See what our community is saying
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="p-6 glow-primary">
-                <CardContent className="space-y-4">
-                  <p className="font-rajdhani text-lg text-muted-foreground italic">
-                    "{testimonial.content}"
-                  </p>
-                  <div className="flex items-center space-x-3">
-                    <img
-                      src={testimonial.avatar}
-                      alt={testimonial.name}
-                      className="h-12 w-12 rounded-full"
-                    />
-                    <div>
-                      <div className="font-orbitron font-bold text-foreground">
-                        {testimonial.name}
-                      </div>
-                      <div className="font-rajdhani text-sm text-accent">
-                        {testimonial.role}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="py-20">
         <div className="container mx-auto px-4 text-center">
@@ -309,6 +267,11 @@ export function LandingPage() {
       {/* Benefits of registering game on platform */}
       <section className="py-20">
         <div className="container mx-auto px-4 text-center">
+          <img
+              src={"./game-dev-workspace.jpg"}
+              alt={"Game developers image"}
+              className="w-full h-48 object-cover mb-5 rounded-lg"
+            />
           <div className="max-w-3xl mx-auto">
             <h2 className="font-orbitron font-bold text-4xl md:text-6xl mb-6">
               FOR <span className="text-gradient">GAME DEVELOPERS</span>?

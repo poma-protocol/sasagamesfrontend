@@ -45,10 +45,7 @@ export function Footer() {
               <Link to="/how-it-works" className="block text-muted-foreground hover:text-accent transition-colors font-rajdhani">
                 How it Works
               </Link>
-              <Link to="/docs" className="block text-muted-foreground hover:text-accent transition-colors font-rajdhani">
-                Documentation
-              </Link>
-              <Link to="/support" className="block text-muted-foreground hover:text-accent transition-colors font-rajdhani">
+              <Link to="mailto:info@sasagames.com" className="block text-muted-foreground hover:text-accent transition-colors font-rajdhani">
                 Support
               </Link>
             </div>

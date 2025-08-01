@@ -509,7 +509,7 @@ export function RegisterGamePage() {
                         </CardHeader>
                         <CardContent>
                             <div className="text-slate-300 text-sm space-y-2">
-                                <p>• If you have any issue registering a game you can reach out to us at info@pomaprotocol.com</p>
+                                <p>• If you have any issue registering a game you can reach out to us at info@sasagames.com</p>
                             </div>
                         </CardContent>
                     </Card>
