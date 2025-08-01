@@ -23,6 +23,9 @@ export function Footer() {
           <div>
             <h3 className="font-orbitron font-bold text-foreground mb-4">Platform</h3>
             <div className="space-y-2">
+              <Link to="/game-admin/login" className="block text-muted-foreground hover:text-accent transition-colors font-rajdhani">
+                Get started as game admin
+              </Link>
               <Link to="/battles" className="block text-muted-foreground hover:text-accent transition-colors font-rajdhani">
                 Browse Battles
               </Link>
@@ -30,7 +33,7 @@ export function Footer() {
                 My Battles
               </Link>
               <Link to="/quests" className="block text-muted-foreground hover:text-accent transition-colors font-rajdhani">
-                Quests
+                Battles
               </Link>
             </div>
           </div>

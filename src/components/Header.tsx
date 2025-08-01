@@ -18,7 +18,7 @@ export function Header() {
 
     const userNavItems = [
         { name: "My Battles", path: "/my-battles" },
-        { name: "All Battles", path: "/battles" },
+        // { name: "All Battles", path: "/battles" },
         // { name: "How it Works", path: "/how-it-works" },
         // { name: "About Us", path: "/about" },
     ];
@@ -30,9 +30,9 @@ export function Header() {
         { name: "Create Activity", path: "/game-admin/create-activity" },
     ];
 
-    const handleAdminLogin = () => {
-        navigate("/game-admin/login");
-    };
+    // const handleAdminLogin = () => {
+    //     navigate("/game-admin/login");
+    // };
 
     const handleAdminLogout = () => {
         if (!token) return;
@@ -82,16 +82,15 @@ export function Header() {
                     </nav> */}
 
 
-                    <ConnectButton />
-
                     {/* Admin Area & Actions */}
                     <div className="hidden md:flex items-center space-x-4">
-                        {!isAdminLoggedIn && (<Button className="font-rajdhani font-semibold" onClick={handleAdminLogin}>
+                        <ConnectButton />
+                        {/* {!isAdminLoggedIn && (<Button className="font-rajdhani font-semibold" onClick={handleAdminLogin}>
                             <Link to="/game-admin/login" className="flex items-center">
                                 <Settings className="h-4 w-4 mr-2" />
                                 Get Started As Game Admin
                             </Link>
-                        </Button>)}
+                        </Button>)} */}
                         {isAdminLoggedIn ? (
                             <>
                                 {/* Admin Dropdown */}
@@ -230,7 +229,7 @@ export function Header() {
                                             {item.name}
                                         </Link>
                                     ))}
-                                    <Button
+                                    {/* <Button
                                         onClick={() => {
                                             handleAdminLogin();
                                             setIsMenuOpen(false);
@@ -240,7 +239,7 @@ export function Header() {
                                     >
                                         <Settings className="h-4 w-4 mr-2" />
                                         Get Started As Game Admin
-                                    </Button>
+                                    </Button> */}
                                 </>
                             )}
                         </nav>
