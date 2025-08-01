@@ -32,39 +32,44 @@ export function BattleCard(props: FeaturedDeal) {
   return (
     <Card className="game-card group cursor-pointer">
       <CardHeader className="p-0">
-        <div className="relative overflow-hidden rounded-t-lg">
-          <img
-            src={props.image ? `${ACTIVITY_IMAGE_URL}/${props.image}` : "/placeholder.svg"}
-            alt={props.name || "Battle"}
-            className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <Link to={`/battles/${props.id}`}>
+          <div className="relative overflow-hidden rounded-t-lg">
+            <img
+              src={props.image ? `${ACTIVITY_IMAGE_URL}/${props.image}` : "/placeholder.svg"}
+              alt={props.name || "Battle"}
+              className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+            />
 
-          {/* Status Badge */}
-          <Badge
-            className={`absolute top-3 right-3 font-rajdhani font-semibold text-white ${getStatusColor(
-              props.status || "active"
-            )}`}
-          >
-            {(props.status || "active").toUpperCase()}
-          </Badge>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
-          {/* Reward */}
-          <div className="absolute bottom-3 left-3 flex items-center space-x-2">
-            <Trophy className="h-5 w-5 text-yellow-400" />
-            <span className="font-orbitron font-bold text-white text-lg">
-              {props.reward || 0} ETH
-            </span>
+            {/* Status Badge */}
+            <Badge
+              className={`absolute top-3 right-3 font-rajdhani font-semibold text-white ${getStatusColor(
+                props.status || "active"
+              )}`}
+            >
+              {(props.status || "active").toUpperCase()}
+            </Badge>
+
+            {/* Reward */}
+            <div className="absolute bottom-3 left-3 flex items-center space-x-2">
+              <Trophy className="h-5 w-5 text-yellow-400" />
+              <span className="font-orbitron font-bold text-white text-lg">
+                {props.reward || 0} ETH
+              </span>
+            </div>
           </div>
-        </div>
+        </Link>
       </CardHeader>
 
       <CardContent className="p-6 space-y-4">
         {/* Battle Name */}
         <div className="flex flex-row justify-between items-center">
-          <h3 className="font-orbitron font-bold text-xl text-foreground group-hover:text-accent transition-colors">
-            {props.name || "Battle"}
-          </h3>
+          <Link to={`/battles/${props.id}`}>
+            <h3 className="font-orbitron font-bold text-xl text-foreground group-hover:text-accent transition-colors">
+              {props.name || "Battle"}
+            </h3>
+          </Link>
           <Link to={`/battles/${props.id}`}>
             <Eye className="h-5 w-5 text-white hover:text-accent" />
           </Link>
