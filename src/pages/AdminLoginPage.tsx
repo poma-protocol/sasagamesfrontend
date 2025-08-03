@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Lock, LogIn, User } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
@@ -18,7 +18,6 @@ export function AdminLoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const { isAdminLoggedIn, login } = useAdmin();
     const navigate = useNavigate();
-    const { toast } = useToast();
 
     useEffect(() => {
         if (isAdminLoggedIn) {
@@ -28,41 +27,41 @@ export function AdminLoginPage() {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
+        try {
+            setIsLoading(true);
 
-        const res = await axios.post(`${VITE_BACKEND}/auth/login`, {
-            email,
-            password
-        });
+            const res = await axios.post(`${VITE_BACKEND}/auth/login`, {
+                email,
+                password
+            });
 
-        if (res.status === 200) {
-            const token = res.data.token
-            if (!token) {
-                toast({
-                    title: "Login Failed",
-                    description: "No token received",
-                    variant: "destructive",
-                });
+            if (res.status === 200) {
+                const token = res.data.token
+                if (!token) {
+                    toast.success("Please try again, something went wrong");
+                    setIsLoading(false);
+                    return;
+                }
+                login(token);
+                toast.success("Login Successful");
+                setIsLoading(false);
+                navigate("/game-admin/how-it-works");
+            }
+            else {
+                toast.error("Something went wrong, please try again later");
                 setIsLoading(false);
                 return;
             }
-            login(token);
-            toast({
-                title: "Login Successful",
-                description: "Welcome back, admin!",
-            });
-            navigate("/game-admin/how-it-works");
-        } else {
-            toast({
-                title: "Login Failed",
-                description: "Invalid email or password",
-                variant: "destructive",
-            });
+
+            setIsLoading(false);
         }
-
-        setIsLoading(false);
+        catch (error) {
+            console.error("Login error:", error);
+            toast.error("Invalid email or password");
+            setIsLoading(false);
+        }
     };
-
+    console.log("Isloading", isLoading);
     return (
         <div className="min-h-screen bg-background flex items-center justify-center px-4">
             <Card className="w-full max-w-md border-primary/20 bg-card">
