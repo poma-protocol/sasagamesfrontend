@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
             retry: 2,
             refetchOnWindowFocus: true,
         },
-    
+
     },
 });
 function App() {
@@ -34,12 +34,12 @@ function App() {
                 })}>
                     <AdminProvider>
                         <div className="min-h-screen bg-background text-foreground">
+                            <Toaster/>
                             <Header />
                             <main className="pt-16">
                                 <Outlet />
                             </main>
                             <Footer />
-                            <Toaster />
                         </div>
                     </AdminProvider>
                 </RainbowKitProvider>

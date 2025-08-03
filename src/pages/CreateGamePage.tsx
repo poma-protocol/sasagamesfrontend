@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Trash2, Upload, FileText, Gamepad2, Zap } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface Activity {
   id: number;
@@ -23,7 +23,6 @@ interface Activity {
 
 export function CreateGamePage() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   
   const [gameData, setGameData] = useState({
     name: "",
@@ -75,10 +74,7 @@ export function CreateGamePage() {
     e.preventDefault();
     console.log("Creating game:", { ...gameData, activities });
     
-    toast({
-      title: "Game Created Successfully!",
-      description: `${gameData.name} has been added to the platform with ${activities.length} activities.`,
-    });
+    toast.success("Game created successfully!");
 
     // In real app, this would call the API
     navigate("/manage-games");
