@@ -54,7 +54,7 @@ export function Footer() {
             <div className="space-y-4">
               <div className="flex space-x-4">
                 <a
-                  href="https://twitter.com/sasagames"
+                  href="https://x.com/Sasa3Games"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-accent transition-colors"
