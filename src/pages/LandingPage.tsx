@@ -19,10 +19,9 @@ import { FeaturedDeal } from "@/types";
 
 // Mock data for demonstration
 const mockStats = {
-  totalPlaytime: "2.5M",
-  rewardsDistributed: "150K",
-  activeBattles: 42,
-  totalPlayers: "75K"
+    totalPlaytime: "2K",
+    rewardsDistributed: "14",
+    totalPlayers: "700"
 };
 
 const testimonials = [
@@ -167,7 +166,7 @@ export function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
             <Card className="text-center p-6 glow-primary">
               <CardContent className="space-y-2">
                 <Clock className="h-8 w-8 text-accent mx-auto" />
@@ -192,7 +191,7 @@ export function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="text-center p-6 glow-primary">
+            {/* <Card className="text-center p-6 glow-primary">
               <CardContent className="space-y-2">
                 <Zap className="h-8 w-8 text-neon-blue mx-auto" />
                 <div className="font-orbitron font-bold text-3xl text-foreground">
@@ -202,7 +201,7 @@ export function LandingPage() {
                   Active Battles
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             <Card className="text-center p-6 glow-primary">
               <CardContent className="space-y-2">

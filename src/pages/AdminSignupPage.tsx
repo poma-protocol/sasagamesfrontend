@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Lock, User } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
@@ -18,7 +18,6 @@ export function AdminSignupPage() {
     const [isLoading, setIsLoading] = useState(false);
     const { isAdminLoggedIn } = useAdmin();
     const navigate = useNavigate();
-    const { toast } = useToast();
 
     useEffect(() => {
         if (isAdminLoggedIn) {
@@ -28,31 +27,32 @@ export function AdminSignupPage() {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
+        try {
+            setIsLoading(true);
 
-        const res = await axios.post(`${VITE_BACKEND}/auth/register`, {
-            email,
-            password
-        });
-
-        if (res.status === 201) {
-            localStorage.setItem("isAdminLoggedIn", "true");
-            const token = res.data.token;
-            localStorage.setItem("accessToken", token);
-            toast({
-                title: "Signup Successful",
-                description: "Welcome, admin!",
+            const res = await axios.post(`${VITE_BACKEND}/auth/register`, {
+                email,
+                password
             });
-            navigate("/game-admin/how-it-works");
-        } else {
-            toast({
-                title: "Signup Failed",
-                description: "Invalid email or password",
-                variant: "destructive",
-            });
+            if (res.status === 201) {
+                localStorage.setItem("isAdminLoggedIn", "true");
+                const token = res.data.token;
+                localStorage.setItem("accessToken", token);
+                toast.success("Signup Successful");
+                navigate("/game-admin/how-it-works");
+            } else {
+                toast.error("Invalid email or password");
+                setIsLoading(false);
+                return;
+            }
+            setIsLoading(false);
         }
-
-        setIsLoading(false);
+        catch (error) {
+            console.error("Signup error:", error);
+            toast.error("Something went wrong, please try again later");
+            setIsLoading(false);
+            return;
+        }
     };
 
     return (
